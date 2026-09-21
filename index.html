@@ -35,7 +35,7 @@
         .phone-container {
             width: 100%;
             height: 100vh;
-            height: 100dvh; /* 모바일 동적 뷰포트 높이 지원 */
+            height: 100dvh;
             max-width: 480px;
             background-color: #ffffff;
             display: flex;
@@ -101,7 +101,7 @@
             box-shadow: 0 2px 6px rgba(0,0,0,0.04);
         }
 
-        /* 구글맵 모바일 터치 최적화 */
+        /* 구글맵 설정 */
         .google-map-box {
             width: 100%;
             height: 200px;
@@ -239,12 +239,12 @@
             line-height: 1.4;
         }
 
-        /* [핵심 수정] 하단 액션 바: 잘림 방지 및 노치/홈바 안전 영역 확보 */
+        /* 하단 고정 액션 바 (안전 영역 적용) */
         .action-bar {
             display: flex;
             gap: 8px;
             padding: 10px 12px;
-            padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px)); /* 아이폰 하단 영역 대응 */
+            padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px));
             background-color: white;
             border-top: 1px solid #e2e8f0;
             flex-shrink: 0;
@@ -341,8 +341,6 @@
             cursor: grab;
         }
 
-        .img-modal-body:active { cursor: grabbing; }
-        
         #modalZoomWrapper {
             width: 100%;
             height: 100%;
@@ -386,7 +384,6 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
         }
 
         .zoom-reset-btn {
@@ -426,7 +423,7 @@
         .chat-header { padding: 12px 16px; background-color: var(--primary-green); color: white; border-top-left-radius: 20px; border-top-right-radius: 20px; display: flex; justify-content: space-between; align-items: center; font-weight: bold; font-size: 0.85rem; }
         .close-chat { background: none; border: none; color: white; font-size: 1.2rem; cursor: pointer; }
         .chat-body { flex: 1; padding: 12px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; background-color: #f9fbf9; }
-        .chat-message { max-width: 85%; padding: 8px 12px; border-radius: 12px; font-size: 0.8rem; line-height: 1.4; }
+        .chat-message { max-width: 88%; padding: 9px 12px; border-radius: 12px; font-size: 0.8rem; line-height: 1.45; word-break: break-all; }
         .chat-message.bot { background-color: white; align-self: flex-start; border: 1px solid #e2e8f0; color: #2d3748; }
         .chat-message.user { background-color: var(--accent-green); color: white; align-self: flex-end; }
         .quick-chips { display: flex; gap: 6px; padding: 8px 10px; overflow-x: auto; background: #fff; border-top: 1px solid #edf2f7; -webkit-overflow-scrolling: touch; }
@@ -449,8 +446,8 @@
             <!-- 1. 구글맵 위치 안내 -->
             <div class="map-section">
                 <div class="section-title">
-                    <span>🗺️ 구글맵 위치</span>
-                    <span class="map-tag">✌️ 두 손가락으로 이동/확대</span>
+                    <span>🗺️ 위치 및 오시는 길</span>
+                    <span class="map-tag">✌️ 지도 확대가능</span>
                 </div>
                 <div class="google-map-box">
                     <iframe 
@@ -462,7 +459,7 @@
                     </iframe>
                 </div>
                 <div class="gps-status-bar">
-                    📍 Google Maps: 화성종합경기타운 (경기도 화성시 향남읍 향남로 470)
+                    📍 경기도 화성시 향남읍 향남로 470 (화성종합경기타운)
                 </div>
             </div>
 
@@ -489,13 +486,13 @@
             <div class="info-card">
                 <div class="section-title">🚨 비상대피로 안내</div>
                 <div class="evac-box">
-                    • <b>비상구 위치:</b> 2층 각 게이트(G1~G21) 통로 및 1층 외부 출입구 연결 비상계단 이용<br>
-                    • <b>대피 방향:</b> 비상시 외부 계단을 통해 <b>야외 주차장 및 광장 대피소</b>로 이동하세요.
+                    • <b>비상구 위치:</b> 2층 각 게이트(G1~G21) 및 1층 출입구 비상계단 연결<br>
+                    • <b>대피 장소:</b> 비상시 외부 계단을 통해 <b>야외 주차장 및 넓은 광장</b>으로 대피하세요.
                 </div>
             </div>
         </div>
 
-        <!-- 하단 액션 바 (화면 최하단에 항상 고정 표출) -->
+        <!-- 하단 액션 바 -->
         <div class="action-bar">
             <button class="action-btn btn-call" onclick="toggleCallModal()">📞 전화 문의</button>
             <button class="action-btn btn-chat" onclick="toggleChat()">💬 AI 챗봇 상담</button>
@@ -504,15 +501,16 @@
         <!-- 전화 문의 모달 팝업 -->
         <div class="overlay" id="callOverlay">
             <div class="call-modal">
-                <h3>📞 입주기관 및 주요 대표전화</h3>
+                <h3>📞 주요 기관 전화번호</h3>
                 <div class="call-list">
                     <a href="tel:031-8012-7500" class="call-option-btn">🏢 화성도시공사 대표전화<span>031-8012-7500</span></a>
+                    <a href="tel:031-371-0011" class="call-option-btn">🏟️ 경기타운 관리사무실<span>031-371-0011</span></a>
                     <a href="tel:031-355-3500" class="call-option-btn">🏆 화성시체육회<span>031-355-3500</span></a>
                     <a href="tel:031-8059-0676" class="call-option-btn">♿ 화성시장애인체육회<span>031-8059-0676</span></a>
                     <a href="tel:031-366-4081" class="call-option-btn">⚽ 화성FC 사무국<span>031-366-4081</span></a>
-                    <a href="tel:031-8059-3195" class="call-option-btn">🚐 화성시 교통약자이동지원센터<span>031-8059-3195</span></a>
-                    <a href="tel:031-5189-6436" class="call-option-btn">👶 화성시 드림스타트센터<span>031-5189-6436</span></a>
-                    <a href="tel:031-120" class="call-option-btn">🏛️ 화성시청 콜센터 (만세구청)<span>031-120</span></a>
+                    <a href="tel:031-8059-3195" class="call-option-btn">🚐 교통약자이동지원센터<span>031-8059-3195</span></a>
+                    <a href="tel:031-5189-6436" class="call-option-btn">👶 드림스타트센터<span>031-5189-6436</span></a>
+                    <a href="tel:031-120" class="call-option-btn">🏛️ 화성시청 콜센터<span>031-120</span></a>
                 </div>
                 <button class="call-close-btn" onclick="toggleCallModal()">닫기</button>
             </div>
@@ -535,7 +533,7 @@
             </div>
 
             <div class="img-modal-footer">
-                * 핀치 줌 / 두 손가락으로 확대하고 드래그하여 상/하/좌/우 이동하세요.
+                * 핀치 줌 / 두 손가락으로 확대 및 이동 가능합니다.
             </div>
         </div>
 
@@ -546,18 +544,17 @@
                 <button class="close-chat" onclick="toggleChat()">✕</button>
             </div>
             <div class="chat-body" id="chatBody">
-                <div class="chat-message bot">안녕하세요! 화성종합경기타운 스마트 안내 도우미입니다. 시설 배치, 입주기관 전화번호, 운영시간, 대관/강습, 주차 등에 대해 질문해 보세요.</div>
+                <div class="chat-message bot">안녕하세요! 화성도시공사 및 화성시청 정보를 기반으로 안내해 드리는 AI 도우미입니다. 시설안내, 대관, 주차, 입주기관 전화번호 등을 질문해 보세요!</div>
             </div>
             <div class="quick-chips">
+                <div class="chip" onclick="sendQuickMessage('주차 정보')">🚗 주차 안내/요금</div>
+                <div class="chip" onclick="sendQuickMessage('주요 시설')">🏟️ 경기장 시설 정보</div>
+                <div class="chip" onclick="sendQuickMessage('대관 신청')">📋 대관 신청 방법</div>
                 <div class="chip" onclick="sendQuickMessage('입주기관 전화번호')">📞 입주기관 전화번호</div>
-                <div class="chip" onclick="sendQuickMessage('시설 소개')">🏟️ 주요 시설 안내</div>
-                <div class="chip" onclick="sendQuickMessage('운영시간')">⏰ 운영시간/휴관일</div>
-                <div class="chip" onclick="sendQuickMessage('대관 신청')">📋 대관 신청</div>
-                <div class="chip" onclick="sendQuickMessage('강습 프로그램')">👟 강습/수강신청</div>
-                <div class="chip" onclick="sendQuickMessage('주차 요금')">🚗 주차 안내</div>
+                <div class="chip" onclick="sendQuickMessage('오시는 길')">📍 위치 및 오시는 길</div>
             </div>
             <div class="chat-footer">
-                <input type="text" id="userInput" placeholder="궁금한 내용을 입력하세요..." onkeypress="if(event.key === 'Enter') sendMessage()">
+                <input type="text" id="userInput" placeholder="질문을 입력하세요..." onkeypress="if(event.key === 'Enter') sendMessage()">
                 <button onclick="sendMessage()">전송</button>
             </div>
         </div>
@@ -603,13 +600,13 @@
 
             const infoDesc = document.getElementById('floorInfoDesc');
             if (floor === '3f') {
-                infoDesc.innerHTML = `<div class="floor-map-title">🏟️ 3층 안내도 (방송/미디어실 및 VIP석)</div><div class="floor-map-desc">• 주요 시설: 상층 관람석, 방송/중계실, 기자회견실, VIP 참관석</div>`;
+                infoDesc.innerHTML = `<div class="floor-map-title">🏟️ 3층 안내도 (VIP 및 미디어 시설)</div><div class="floor-map-desc">• 주요 시설: VIP 참관석, 방송중계실, 기자회견실, 경기운영 본부</div>`;
             } else if (floor === '2f') {
-                infoDesc.innerHTML = `<div class="floor-map-title">🏟️ 2층 안내도 (관람석 및 편의시설)</div><div class="floor-map-desc">• 주요 시설: 매점, 다목적실, 물품보관소/안내소, 미아보호실, 의무실/수유실</div>`;
+                infoDesc.innerHTML = `<div class="floor-map-title">🏟️ 2층 안내도 (관람석 및 편의시설)</div><div class="floor-map-desc">• 주요 시설: 주경기장/체육관 관람석 출입구(G1~G21), 매점, 의무실, 수유실</div>`;
             } else if (floor === '1f') {
-                infoDesc.innerHTML = `<div class="floor-map-title">🏟️ 1층 안내도 (선수단 및 행정/기관 시설)</div><div class="floor-map-desc">• 주요 시설: 화성도시공사, 화성시복지재단, 지역자활센터, 시푸른공원관리과 등 입주기관</div>`;
+                infoDesc.innerHTML = `<div class="floor-map-title">🏟️ 1층 안내도 (행정/입주기관 시설)</div><div class="floor-map-desc">• 주요 시설: 화성도시공사, 화성시체육회, 화성FC, 교통약자이동지원센터, 선수락커룸</div>`;
             } else if (floor === 'b1') {
-                infoDesc.innerHTML = `<div class="floor-map-title">🏢 지하 1층 안내도 (지하주차장 및 중앙방재실)</div><div class="floor-map-desc">• 주요 시설: 지하 주차장 연결 통로, 기계실, 전기실, 중앙 방재실</div>`;
+                infoDesc.innerHTML = `<div class="floor-map-title">🏢 지하 1층 안내도 (주차장 및 방재실)</div><div class="floor-map-desc">• 주요 시설: 지하주차장, 기계/전기실, 중앙방재실, 주출입 통로</div>`;
             }
         }
 
@@ -621,31 +618,14 @@
         function toggleCallModal() { document.getElementById('callOverlay').classList.toggle('active'); }
         function toggleChat() { document.getElementById('chatModal').classList.toggle('active'); }
 
-        // 평면도 확대 및 터치 제어
-        let scale = 1;
-        let translateX = 0;
-        let translateY = 0;
-        let isDragging = false;
-        let startX = 0, startY = 0;
-        let initialPinchDistance = 0, initialScale = 1;
-
+        // 확대 및 제어 로직
+        let scale = 1, translateX = 0, translateY = 0, isDragging = false, startX = 0, startY = 0, initialPinchDistance = 0, initialScale = 1;
         const zoomWrapper = document.getElementById('modalZoomWrapper');
         const touchArea = document.getElementById('modalTouchArea');
 
-        function updateTransform() {
-            zoomWrapper.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
-        }
-
-        function resetZoom() {
-            scale = 1; translateX = 0; translateY = 0;
-            updateTransform();
-        }
-
-        function adjustZoom(delta) {
-            scale = Math.max(1, Math.min(scale + delta, 4));
-            if (scale === 1) { translateX = 0; translateY = 0; }
-            updateTransform();
-        }
+        function updateTransform() { zoomWrapper.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`; }
+        function resetZoom() { scale = 1; translateX = 0; translateY = 0; updateTransform(); }
+        function adjustZoom(delta) { scale = Math.max(1, Math.min(scale + delta, 4)); if (scale === 1) { translateX = 0; translateY = 0; } updateTransform(); }
 
         function openImageModal() {
             zoomWrapper.innerHTML = getFloorContent(currentFloorState);
@@ -653,10 +633,7 @@
             document.getElementById('imgModalOverlay').classList.add('active');
             resetZoom();
         }
-
-        function closeImageModal() {
-            document.getElementById('imgModalOverlay').classList.remove('active');
-        }
+        function closeImageModal() { document.getElementById('imgModalOverlay').classList.remove('active'); }
 
         touchArea.addEventListener('touchstart', (e) => {
             if (e.touches.length === 1) {
@@ -665,10 +642,7 @@
                 startY = e.touches[0].clientY - translateY;
             } else if (e.touches.length === 2) {
                 isDragging = false;
-                initialPinchDistance = Math.hypot(
-                    e.touches[0].clientX - e.touches[1].clientX,
-                    e.touches[0].clientY - e.touches[1].clientY
-                );
+                initialPinchDistance = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
                 initialScale = scale;
             }
         });
@@ -680,10 +654,7 @@
                 translateY = e.touches[0].clientY - startY;
                 updateTransform();
             } else if (e.touches.length === 2 && initialPinchDistance > 0) {
-                const currentDist = Math.hypot(
-                    e.touches[0].clientX - e.touches[1].clientX,
-                    e.touches[0].clientY - e.touches[1].clientY
-                );
+                const currentDist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
                 scale = Math.max(1, Math.min(initialScale * (currentDist / initialPinchDistance), 4));
                 if (scale === 1) { translateX = 0; translateY = 0; }
                 updateTransform();
@@ -691,10 +662,7 @@
         }, { passive: false });
 
         touchArea.addEventListener('touchend', (e) => {
-            if (e.touches.length === 0) {
-                isDragging = false;
-                initialPinchDistance = 0;
-            }
+            if (e.touches.length === 0) { isDragging = false; initialPinchDistance = 0; }
         });
 
         function sendQuickMessage(text) {
@@ -702,15 +670,16 @@
             sendMessage();
         }
 
+        // [화성도시공사 & 화성시청 공식 데이터 탑재 챗봇 응답 로직]
         function sendMessage() {
             const input = document.getElementById('userInput');
             const chatBody = document.getElementById('chatBody');
-            const text = input.value.trim();
-            if (!text) return;
+            const query = input.value.trim();
+            if (!query) return;
 
             const userMsg = document.createElement('div');
             userMsg.className = 'chat-message user';
-            userMsg.innerText = text;
+            userMsg.innerText = query;
             chatBody.appendChild(userMsg);
             input.value = '';
             chatBody.scrollTop = chatBody.scrollHeight;
@@ -718,7 +687,47 @@
             setTimeout(() => {
                 const botMsg = document.createElement('div');
                 botMsg.className = 'chat-message bot';
-                botMsg.innerHTML = `💬 하단 **[📞 전화 문의]** 버튼을 누르시면 각 입주기관으로 바로 전화 연결이 가능합니다.`;
+                
+                let responseText = "";
+
+                if (query.includes("주차") || query.includes("요금") || query.includes("차량")) {
+                    responseText = `🚗 <b>주차장 이용 안내 (화성도시공사)</b><br><br>` +
+                        `• <b>주차 요금:</b> <b>무료</b><br>` +
+                        `• <b>총 주차 대수:</b> 1,783대 수용 가능<br>` +
+                        `• <b>전용 주차:</b> 장애인용 108면, 버스 25면, 전기차 충전소 41대, 친환경 50대 포함<br>` +
+                        `• 경기나 행사 개최 시 차량 이동에 유의해 주시기 바랍니다.`;
+                } else if (query.includes("시설") || query.includes("경기장") || query.includes("소개") || query.includes("체육관")) {
+                    responseText = `🏟️ <b>화성종합경기타운 시설 개요</b><br><br>` +
+                        `• <b>주경기장:</b> 총 35,270석 (천연잔디 규격 105m×68m, 400m 8레인 트랙, K리그2 화성FC 홈구장)<br>` +
+                        `• <b>실내체육관:</b> 총 5,152석 (농구, 배구, 배드민턴 등 멀티 경기장)<br>` +
+                        `• <b>보조경기장:</b> 총 2,002석 (천연잔디 필드 및 8레인 육상 트랙)`;
+                } else if (query.includes("대관") || query.includes("예약") || query.includes("신청")) {
+                    responseText = `📋 <b>경기장 대관 신청 안내</b><br><br>` +
+                        `• <b>신청 방법:</b> <i>화성특례시 통합예약시스템</i>(yeyak.hscity.go.kr)을 통해 온라인 신청<br>` +
+                        `• <b>접수 일정:</b><br>` +
+                        ` - 화성시 관내 주민: 전월 28일 10시부터<br>` +
+                        ` - 관외 주민: 전월 7일 10시부터<br>` +
+                        `• 자세한 문의: 경기타운 대관 담당자(031-371-0011)`;
+                } else if (query.includes("전화") || query.includes("번호") || query.includes("입주") || query.includes("기관")) {
+                    responseText = `📞 <b>주요 입주기관 연락처</b><br><br>` +
+                        `• 화성도시공사 대표: 031-8012-7500<br>` +
+                        `• 경기타운 관리사무실: 031-371-0011<br>` +
+                        `• 화성시체육회: 031-355-3500<br>` +
+                        `• 화성시장애인체육회: 031-8059-0676<br>` +
+                        `• 화성FC 사무국: 031-366-4081<br>` +
+                        `• 교통약자이동지원센터: 031-8059-3195<br>` +
+                        `* 화면 하단 <b>[📞 전화 문의]</b> 버튼을 누르면 바로 연결 가능합니다.`;
+                } else if (query.includes("위치") || query.includes("오시는") || query.includes("주소") || query.includes("버스")) {
+                    responseText = `📍 <b>위치 및 오시는 길</b><br><br>` +
+                        `• <b>주소:</b> 경기도 화성시 향남읍 향남로 470 (화성종합경기타운)<br>` +
+                        `• <b>대중교통:</b> 향남역 및 향남환승터미널 하차 후 시내버스 이용 (화성종합경기타운 정류장 하차)`;
+                } else {
+                    responseText = `🤖 요청하신 내용에 대한 안내입니다.<br><br>` +
+                        `화성종합경기타운은 <b>화성도시공사</b>에서 위탁 관리하고 있으며, 주차는 <b>무료</b>입니다.<br>` +
+                        `추가 문의사항은 관리사무실(031-371-0011) 또는 화성시청 콜센터(031-120)로 문의하시면 친절히 안내받으실 수 있습니다.`;
+                }
+
+                botMsg.innerHTML = responseText;
                 chatBody.appendChild(botMsg);
                 chatBody.scrollTop = chatBody.scrollHeight;
             }, 300);
