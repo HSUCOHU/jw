@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
-    <title>화성종합경기타운 스마트 통합 안내</title>
+    <title>화성종합경기타운 스마트 AI 통합 안내</title>
     <style>
         :root {
             --primary-green: #1b4d3e;
@@ -101,15 +101,16 @@
             box-shadow: 0 2px 6px rgba(0,0,0,0.04);
         }
 
-        /* 구글맵 조작 영역 */
+        /* 구글맵 조작 영역 (터치 터널링 설정) */
         .google-map-box {
             width: 100%;
-            height: 200px;
+            height: 220px;
             border-radius: 8px;
             overflow: hidden;
             border: 1px solid #cbd5e0;
             position: relative;
             background: #e5e3df;
+            touch-action: pan-x pan-y pinch-zoom !important;
         }
 
         .google-map-box iframe {
@@ -474,17 +475,18 @@
         </header>
 
         <div class="content">
-            <!-- 1. 구글맵 위치 안내 -->
+            <!-- 1. 구글맵 위치 안내 (메인 화면에서 바로 확대/축소 가능하도록 URL 및 제스처 구성 업데이트) -->
             <div class="map-section">
                 <div class="section-title">
                     <span>🗺️ 위치 및 오시는 길</span>
-                    <span class="map-tag">✌️ 지도에서 바로 확대/축소 가능</span>
+                    <span class="map-tag">✌️ 화면에서 바로 확대/축소 가능</span>
                 </div>
                 <div class="google-map-box">
                     <iframe 
-                        src="https://maps.google.com/maps?q=37.1375,126.9247&hl=ko&z=15&output=embed&gestureHandling=greedy" 
-                        allowfullscreen 
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3171.86241072978!2d126.9221251!3d37.1375!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x357b447a11ebc5a1%3A0x6b6d51187c3e538!2z7ZmU7ISx7Kii7ZWp6rK96riw7YOA7IanaQ!5e0!3m2!1sko!2skr!4v1700000000000!5m2!1sko!2skr&gestureHandling=greedy" 
+                        allowfullscreen="" 
                         loading="eager"
+                        referrerpolicy="no-referrer-when-downgrade"
                         aria-hidden="false" 
                         tabindex="0">
                     </iframe>
@@ -494,7 +496,7 @@
                 </div>
             </div>
 
-            <!-- 2. 경기장 층별 평면도 및 시설 배치 (주경기장 / 실내체육관 탭 구조 적용) -->
+            <!-- 2. 경기장 층별 평면도 및 시설 배치 (주경기장 / 실내체육관 탭 구조) -->
             <div class="floor-section">
                 <div class="section-title">🏢 경기장 층별 평면도 및 시설 배치</div>
                 
@@ -506,7 +508,7 @@
 
                 <!-- 층 선택 버튼 탭 -->
                 <div class="floor-tabs" id="floorTabContainer">
-                    <!-- 스크립트에서 동적 생성 및 갱신 -->
+                    <!-- 스크립트에서 동적 생성 -->
                 </div>
                 
                 <!-- 평면도 표시 영역 -->
@@ -602,7 +604,7 @@
         let currentVenue = 'main'; // 'main' (주경기장) 또는 'indoor' (실내체육관)
         let currentFloor = '1f';
 
-        // 경기장별 층 데이터 및 실제 이미지 매핑 (실제 파일명이 있을 경우 대체 가능)
+        // 경기장별 층 데이터 및 실제 이미지 매핑
         const stadiumImageData = {
             main: {
                 '3f': 'main-3f.jpg',
@@ -710,12 +712,10 @@
         function getFloorContent(venue, floor) {
             const imgFileName = stadiumImageData[venue] ? stadiumImageData[venue][floor] : null;
 
-            // 주경기장의 1층, 2층 실제 파일 연결 예시
             if ((venue === 'main' && (floor === '1f' || floor === '2f')) && imgFileName) {
                 return `<img src="${imgFileName}" alt="${venueConfig[venue].name} ${floor.toUpperCase()} 안내도" class="floor-real-img" onerror="this.onerror=null; this.parentElement.innerHTML=getFallbackSvg('${venue}', '${floor}');" />`;
             }
 
-            // 나머지 및 이미지 미존재 시 벡터 SVG 그래픽 대체
             return getFallbackSvg(venue, floor);
         }
 
@@ -740,7 +740,7 @@
         function toggleCallModal() { document.getElementById('callOverlay').classList.toggle('active'); }
         function toggleChat() { document.getElementById('chatModal').classList.toggle('active'); }
 
-        // 확대 및 제어 로직
+        // 평면도 모달 및 Zoom 제어 로직
         let scale = 1, translateX = 0, translateY = 0, isDragging = false, startX = 0, startY = 0, initialPinchDistance = 0, initialScale = 1;
         const zoomWrapper = document.getElementById('modalZoomWrapper');
         const touchArea = document.getElementById('modalTouchArea');
