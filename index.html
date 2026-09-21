@@ -87,7 +87,7 @@
         .section-title {
             font-size: 0.85rem;
             font-weight: bold;
-            margin-bottom: 6px;
+            margin-bottom: 8px;
             color: var(--primary-green);
             display: flex;
             align-items: center;
@@ -101,10 +101,10 @@
             box-shadow: 0 2px 6px rgba(0,0,0,0.04);
         }
 
-        /* 구글맵 모바일 바로 조작 가능 레이아웃 */
+        /* 구글맵 조작 영역 */
         .google-map-box {
             width: 100%;
-            height: 220px;
+            height: 200px;
             border-radius: 8px;
             overflow: hidden;
             border: 1px solid #cbd5e0;
@@ -141,6 +141,37 @@
             border: 1px solid #c8e6c9;
         }
 
+        /* 경기장 구분 탭 (주경기장 vs 실내체육관) */
+        .venue-tabs {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 8px;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 6px;
+        }
+
+        .venue-tab-btn {
+            flex: 1;
+            padding: 8px 0;
+            border: 1px solid #cbd5e0;
+            background-color: #f8fafc;
+            color: #4a5568;
+            border-radius: 8px;
+            font-size: 0.82rem;
+            font-weight: bold;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s ease;
+        }
+
+        .venue-tab-btn.active {
+            background-color: var(--primary-green);
+            color: white;
+            border-color: var(--primary-green);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        /* 층별 선택 탭 */
         .floor-tabs {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -152,7 +183,7 @@
             background-color: #f1f5f9;
             border: 1px solid #cbd5e0;
             color: #4a5568;
-            padding: 8px 0;
+            padding: 7px 0;
             border-radius: 6px;
             font-size: 0.75rem;
             font-weight: bold;
@@ -161,9 +192,9 @@
         }
 
         .floor-tab-btn.active {
-            background-color: var(--primary-green);
+            background-color: var(--accent-green);
             color: white;
-            border-color: var(--primary-green);
+            border-color: var(--accent-green);
         }
 
         .floor-map-display {
@@ -239,7 +270,7 @@
             line-height: 1.4;
         }
 
-        /* 하단 고정 액션 바 (안전 영역 적용) */
+        /* 하단 고정 액션 바 */
         .action-bar {
             display: flex;
             gap: 8px;
@@ -278,7 +309,7 @@
             color: white;
         }
 
-        /* 전화 문의 모달 */
+        /* 모달 팝업 공통 */
         .overlay {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -443,7 +474,7 @@
         </header>
 
         <div class="content">
-            <!-- 1. 구글맵 위치 안내 (메인 화면에서 즉시 확대/축소 기능 적용) -->
+            <!-- 1. 구글맵 위치 안내 -->
             <div class="map-section">
                 <div class="section-title">
                     <span>🗺️ 위치 및 오시는 길</span>
@@ -463,16 +494,22 @@
                 </div>
             </div>
 
-            <!-- 2. 층별 평면도 안내 -->
+            <!-- 2. 경기장 층별 평면도 및 시설 배치 (주경기장 / 실내체육관 탭 구조 적용) -->
             <div class="floor-section">
                 <div class="section-title">🏢 경기장 층별 평면도 및 시설 배치</div>
-                <div class="floor-tabs">
-                    <button class="floor-tab-btn" onclick="switchFloor('3f', this)">3층</button>
-                    <button class="floor-tab-btn" onclick="switchFloor('2f', this)">2층</button>
-                    <button class="floor-tab-btn active" id="defaultTab" onclick="switchFloor('1f', this)">1층</button>
-                    <button class="floor-tab-btn" onclick="switchFloor('b1', this)">지하1층</button>
+                
+                <!-- 경기장 셀렉트 탭 -->
+                <div class="venue-tabs">
+                    <button class="venue-tab-btn active" id="venueMainBtn" onclick="switchVenue('main')">🏟️ 주경기장</button>
+                    <button class="venue-tab-btn" id="venueIndoorBtn" onclick="switchVenue('indoor')">🏀 실내체육관</button>
+                </div>
+
+                <!-- 층 선택 버튼 탭 -->
+                <div class="floor-tabs" id="floorTabContainer">
+                    <!-- 스크립트에서 동적 생성 및 갱신 -->
                 </div>
                 
+                <!-- 평면도 표시 영역 -->
                 <div class="floor-map-display">
                     <div class="floor-img-box" onclick="openImageModal()">
                         <div id="svgContainer" style="width:100%; height:100%; display:flex; justify-content:center; align-items:center;"></div>
@@ -486,7 +523,7 @@
             <div class="info-card">
                 <div class="section-title">🚨 비상대피로 안내</div>
                 <div class="evac-box">
-                    • <b>비상구 위치:</b> 2층 각 게이트(G1~G21) 및 1층 출입구 비상계단 연결<br>
+                    • <b>비상구 위치:</b> 각 층 지정 게이트 및 비상계단 연결<br>
                     • <b>대피 장소:</b> 비상시 외부 계단을 통해 <b>야외 주차장 및 넓은 광장</b>으로 대피하세요.
                 </div>
             </div>
@@ -561,58 +598,143 @@
     </div>
 
     <script>
-        let currentFloorState = '1f';
+        // 경기장 및 층 상태 관리
+        let currentVenue = 'main'; // 'main' (주경기장) 또는 'indoor' (실내체육관)
+        let currentFloor = '1f';
 
-        const floorImageData = {
-            '1f': '1층.jpg',
-            '2f': '2층.jpg'
+        // 경기장별 층 데이터 및 실제 이미지 매핑 (실제 파일명이 있을 경우 대체 가능)
+        const stadiumImageData = {
+            main: {
+                '3f': 'main-3f.jpg',
+                '2f': '2층.jpg',
+                '1f': '1층.jpg',
+                'b1': 'main-b1.jpg'
+            },
+            indoor: {
+                '3f': 'indoor-3f.jpg',
+                '2f': 'indoor-2f.jpg',
+                '1f': 'indoor-1f.jpg',
+                'b1': 'indoor-b1.jpg'
+            }
         };
 
-        function getFloorContent(floorKey) {
-            if (floorKey === '1f' || floorKey === '2f') {
-                return `<img src="${floorImageData[floorKey]}" alt="${floorKey.toUpperCase()} 안내도" class="floor-real-img" onerror="this.onerror=null; this.src='https://via.placeholder.com/500?text=${floorKey.toUpperCase()}+Image+Not+Found';" />`;
+        // 경기장별 층 구성 정보
+        const venueConfig = {
+            main: {
+                name: "주경기장",
+                floors: [
+                    { id: '3f', name: '3층' },
+                    { id: '2f', name: '2층' },
+                    { id: '1f', name: '1층' },
+                    { id: 'b1', name: '지하1층' }
+                ],
+                descriptions: {
+                    '3f': { title: "🏟️ 주경기장 3층 (VIP 및 미디어석)", desc: "• 주요 시설: VIP 참관석, 방송중계실, 기자회견실, 경기운영 본부" },
+                    '2f': { title: "🏟️ 주경기장 2층 (관람석 및 편의시설)", desc: "• 주요 시설: 관람석 출입 게이트(G1~G21), 매점, 의무실, 수유실" },
+                    '1f': { title: "🏟️ 주경기장 1층 (행정/입주기관)", desc: "• 주요 시설: 화성도시공사, 화성시체육회, 화성FC, 교통약자지원센터, 선수락커룸" },
+                    'b1': { title: "🏟️ 주경기장 지하1층 (주차 및 방재실)", desc: "• 주요 시설: 지하주차장, 기계/전기실, 중앙방재실, 선수 전용 통로" }
+                }
+            },
+            indoor: {
+                name: "실내체육관",
+                floors: [
+                    { id: '2f', name: '2층' },
+                    { id: '1f', name: '1층' },
+                    { id: 'b1', name: '지하1층' }
+                ],
+                descriptions: {
+                    '2f': { title: "🏀 실내체육관 2층 (관람석)", desc: "• 주요 시설: 일반 관람석 입구, 방송실, 관람객 편의시설" },
+                    '1f': { title: "🏀 실내체육관 1층 (플로어 및 선수시설)", desc: "• 주요 시설: 경기 플로어(농구/배구/배드민턴), 심판실, 선수 대기실, 운영사무실" },
+                    'b1': { title: "🏀 실내체육관 지하1층 (기계실 및 주차)", desc: "• 주요 시설: 지하 주차공간, 창고 및 설비 제어실" }
+                }
+            }
+        };
+
+        // 경기장 전환
+        function switchVenue(venueKey) {
+            currentVenue = venueKey;
+            
+            // 탭 활성화 스타일 업데이트
+            document.getElementById('venueMainBtn').classList.toggle('active', venueKey === 'main');
+            document.getElementById('venueIndoorBtn').classList.toggle('active', venueKey === 'indoor');
+
+            // 기본 층을 1층으로 설정
+            currentFloor = '1f';
+
+            // 층 버튼 렌더링
+            renderFloorTabs();
+            // 내용 업데이트
+            updateFloorDisplay();
+        }
+
+        // 층 선택 버튼 동적 생성
+        function renderFloorTabs() {
+            const container = document.getElementById('floorTabContainer');
+            container.innerHTML = '';
+            const floors = venueConfig[currentVenue].floors;
+
+            // 컬럼 개수에 맞게 Grid 스타일 조정
+            container.style.gridTemplateColumns = `repeat(${floors.length}, 1fr)`;
+
+            floors.forEach(f => {
+                const btn = document.createElement('button');
+                btn.className = `floor-tab-btn ${f.id === currentFloor ? 'active' : ''}`;
+                btn.innerText = f.name;
+                btn.onclick = () => switchFloor(f.id, btn);
+                container.appendChild(btn);
+            });
+        }
+
+        // 층 선택 전환
+        function switchFloor(floorId, element) {
+            currentFloor = floorId;
+            document.querySelectorAll('.floor-tab-btn').forEach(btn => btn.classList.remove('active'));
+            if(element) element.classList.add('active');
+            updateFloorDisplay();
+        }
+
+        // 층별 그래픽/이미지 및 설명 업데이트
+        function updateFloorDisplay() {
+            document.getElementById('svgContainer').innerHTML = getFloorContent(currentVenue, currentFloor);
+            
+            const descData = venueConfig[currentVenue].descriptions[currentFloor];
+            const infoDesc = document.getElementById('floorInfoDesc');
+            if (descData) {
+                infoDesc.innerHTML = `<div class="floor-map-title">${descData.title}</div><div class="floor-map-desc">${descData.desc}</div>`;
+            } else {
+                infoDesc.innerHTML = `<div class="floor-map-title">안내 정보</div><div class="floor-map-desc">해당 층의 시설 정보를 준비 중입니다.</div>`;
+            }
+        }
+
+        // 이미지 HTML 또는 SVG 폴백 반환
+        function getFloorContent(venue, floor) {
+            const imgFileName = stadiumImageData[venue] ? stadiumImageData[venue][floor] : null;
+
+            // 주경기장의 1층, 2층 실제 파일 연결 예시
+            if ((venue === 'main' && (floor === '1f' || floor === '2f')) && imgFileName) {
+                return `<img src="${imgFileName}" alt="${venueConfig[venue].name} ${floor.toUpperCase()} 안내도" class="floor-real-img" onerror="this.onerror=null; this.parentElement.innerHTML=getFallbackSvg('${venue}', '${floor}');" />`;
             }
 
-            const floorData = {
-                '3f': { title: "3F VIP & MEDIA", color: "#2d3748", sub: "VIP 참관석 / 미디어실" },
-                'b1': { title: "B1 PARKING & CONTROL", color: "#4a5568", sub: "지하주차장 / 방재실" }
-            };
+            // 나머지 및 이미지 미존재 시 벡터 SVG 그래픽 대체
+            return getFallbackSvg(venue, floor);
+        }
 
-            const data = floorData[floorKey];
+        function getFallbackSvg(venue, floor) {
+            const venueName = venue === 'main' ? '주경기장' : '실내체육관';
+            const color = venue === 'main' ? '#1b4d3e' : '#2e8b57';
             return `
             <svg class="floor-svg" viewBox="0 0 500 500" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
                 <rect width="500" height="500" fill="#ffffff"/>
                 <circle cx="250" cy="250" r="230" fill="none" stroke="#e2e8f0" stroke-width="8"/>
-                <circle cx="250" cy="250" r="210" fill="none" stroke="${data.color}" stroke-width="3" stroke-dasharray="6,6"/>
-                <rect x="140" y="100" width="220" height="300" rx="110" fill="#f8fafc" stroke="${data.color}" stroke-width="4"/>
-                <rect x="180" y="140" width="140" height="220" rx="70" fill="#e8f5e9" stroke="#2e8b57" stroke-width="2"/>
-                <text x="250" y="235" font-size="22" font-weight="bold" fill="${data.color}" text-anchor="middle">${data.title}</text>
-                <text x="250" y="265" font-size="11" fill="#718096" text-anchor="middle">${data.sub}</text>
+                <circle cx="250" cy="250" r="210" fill="none" stroke="${color}" stroke-width="3" stroke-dasharray="6,6"/>
+                <rect x="130" y="120" width="240" height="260" rx="40" fill="#f8fafc" stroke="${color}" stroke-width="4"/>
+                <text x="250" y="235" font-size="22" font-weight="bold" fill="${color}" text-anchor="middle">${venueName} ${floor.toUpperCase()}</text>
+                <text x="250" y="265" font-size="12" fill="#718096" text-anchor="middle">도면 이미지를 준비 중입니다</text>
             </svg>`;
         }
 
-        function switchFloor(floor, element) {
-            document.querySelectorAll('.floor-tab-btn').forEach(btn => btn.classList.remove('active'));
-            if(element) element.classList.add('active');
-
-            currentFloorState = floor;
-            document.getElementById('svgContainer').innerHTML = getFloorContent(floor);
-
-            const infoDesc = document.getElementById('floorInfoDesc');
-            if (floor === '3f') {
-                infoDesc.innerHTML = `<div class="floor-map-title">🏟️ 3층 안내도 (VIP 및 미디어 시설)</div><div class="floor-map-desc">• 주요 시설: VIP 참관석, 방송중계실, 기자회견실, 경기운영 본부</div>`;
-            } else if (floor === '2f') {
-                infoDesc.innerHTML = `<div class="floor-map-title">🏟️ 2층 안내도 (관람석 및 편의시설)</div><div class="floor-map-desc">• 주요 시설: 주경기장/체육관 관람석 출입구(G1~G21), 매점, 의무실, 수유실</div>`;
-            } else if (floor === '1f') {
-                infoDesc.innerHTML = `<div class="floor-map-title">🏟️ 1층 안내도 (행정/입주기관 시설)</div><div class="floor-map-desc">• 주요 시설: 화성도시공사, 화성시체육회, 화성FC, 교통약자이동지원센터, 선수락커룸</div>`;
-            } else if (floor === 'b1') {
-                infoDesc.innerHTML = `<div class="floor-map-title">🏢 지하 1층 안내도 (주차장 및 방재실)</div><div class="floor-map-desc">• 주요 시설: 지하주차장, 기계/전기실, 중앙방재실, 주출입 통로</div>`;
-            }
-        }
-
         document.addEventListener('DOMContentLoaded', () => {
-            const defaultBtn = document.getElementById('defaultTab');
-            switchFloor('1f', defaultBtn);
+            switchVenue('main');
         });
 
         function toggleCallModal() { document.getElementById('callOverlay').classList.toggle('active'); }
@@ -628,8 +750,9 @@
         function adjustZoom(delta) { scale = Math.max(1, Math.min(scale + delta, 4)); if (scale === 1) { translateX = 0; translateY = 0; } updateTransform(); }
 
         function openImageModal() {
-            zoomWrapper.innerHTML = getFloorContent(currentFloorState);
-            document.getElementById('imgModalTitle').innerText = `${currentFloorState.toUpperCase()} 상세 안내도`;
+            zoomWrapper.innerHTML = getFloorContent(currentVenue, currentFloor);
+            const venueTitle = venueConfig[currentVenue].name;
+            document.getElementById('imgModalTitle').innerText = `${venueTitle} ${currentFloor.toUpperCase()} 상세 안내도`;
             document.getElementById('imgModalOverlay').classList.add('active');
             resetZoom();
         }
