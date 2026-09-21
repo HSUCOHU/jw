@@ -101,10 +101,10 @@
             box-shadow: 0 2px 6px rgba(0,0,0,0.04);
         }
 
-        /* 구글맵 설정 */
+        /* 구글맵 모바일 바로 조작 가능 레이아웃 */
         .google-map-box {
             width: 100%;
-            height: 200px;
+            height: 220px;
             border-radius: 8px;
             overflow: hidden;
             border: 1px solid #cbd5e0;
@@ -116,8 +116,8 @@
             width: 100%;
             height: 100%;
             border: 0;
-            pointer-events: auto;
-            touch-action: pan-x pan-y pinch-zoom;
+            pointer-events: auto !important;
+            touch-action: pan-x pan-y pinch-zoom !important;
         }
 
         .map-tag {
@@ -443,15 +443,15 @@
         </header>
 
         <div class="content">
-            <!-- 1. 구글맵 위치 안내 -->
+            <!-- 1. 구글맵 위치 안내 (메인 화면에서 즉시 확대/축소 기능 적용) -->
             <div class="map-section">
                 <div class="section-title">
                     <span>🗺️ 위치 및 오시는 길</span>
-                    <span class="map-tag">✌️ 지도 확대가능</span>
+                    <span class="map-tag">✌️ 지도에서 바로 확대/축소 가능</span>
                 </div>
                 <div class="google-map-box">
                     <iframe 
-                        src="https://maps.google.com/maps?q=37.1375,126.9247&hl=ko&z=15&output=embed" 
+                        src="https://maps.google.com/maps?q=37.1375,126.9247&hl=ko&z=15&output=embed&gestureHandling=greedy" 
                         allowfullscreen 
                         loading="eager"
                         aria-hidden="false" 
@@ -670,7 +670,7 @@
             sendMessage();
         }
 
-        // [화성도시공사 & 화성시청 공식 데이터 탑재 챗봇 응답 로직]
+        // 챗봇 응답 로직
         function sendMessage() {
             const input = document.getElementById('userInput');
             const chatBody = document.getElementById('chatBody');
