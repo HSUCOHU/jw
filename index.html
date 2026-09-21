@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
+    <title>화성종합경기타운 스마트 통합 안내</title>
+    <style>
+        :root {
+            --primary-green: #1b4d3e;
+            --accent-green: #2e8b57;
+            --light-green: #e8f5e9;
+            --bg-color: #f4f7f5;
+            --text-color: #2c3e50;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #d1d8d3;
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .phone-container {
+            width: 100%;
+            height: 100vh;
+            height: 100dvh; /* 모바일 동적 뷰포트 높이 지원 */
+            max-width: 480px;
+            background-color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+
+        @media (min-width: 481px) {
+            .phone-container {
+                height: calc(100vh - 40px);
+                max-height: 840px;
+                border-radius: 35px;
+                border: 12px solid #14382d;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            }
+        }
+
+        header {
+            background-color: var(--primary-green);
+            color: white;
+            padding: 14px 16px;
+            text-align: center;
+            flex-shrink: 0;
+            z-index: 5;
+        }
+
+        header h1 {
+            font-size: 1.1rem;
+            margin-bottom: 2px;
+        }
+
+        header p {
+            font-size: 0.72rem;
+            opacity: 0.85;
+        }
+
+        .content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            background-color: var(--bg-color);
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .section-title {
+            font-size: 0.85rem;
+            font-weight: bold;
+            margin-bottom: 6px;
+            color: var(--primary-green);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .map-section, .floor-section, .info-card {
+            background-color: white;
+            border-radius: 12px;
+            padding: 10px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+        }
+
+        /* 구글맵 모바일 터치 최적화 */
+        .google-map-box {
+            width: 100%;
+            height: 200px;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #cbd5e0;
+            position: relative;
+            background: #e5e3df;
+        }
+
+        .google-map-box iframe {
+            width: 100%;
+            height: 100%;
+            border: 0;
+            pointer-events: auto;
+            touch-action: pan-x pan-y pinch-zoom;
+        }
+
+        .map-tag {
+            font-size: 0.65rem;
+            background: var(--light-green);
+            color: var(--primary-green);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        .gps-status-bar {
+            margin-top: 6px;
+            background: var(--light-green);
+            color: var(--primary-green);
+            padding: 5px 8px;
+            border-radius: 6px;
+            font-size: 0.72rem;
+            font-weight: bold;
+            text-align: center;
+            border: 1px solid #c8e6c9;
+        }
+
+        .floor-tabs {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 4px;
+            margin-bottom: 8px;
+        }
+
+        .floor-tab-btn {
+            background-color: #f1f5f9;
+            border: 1px solid #cbd5e0;
+            color: #4a5568;
+            padding: 8px 0;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .floor-tab-btn.active {
+            background-color: var(--primary-green);
+            color: white;
+            border-color: var(--primary-green);
+        }
+
+        .floor-map-display {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .floor-img-box {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            max-height: 250px;
+            border-radius: 6px;
+            background-color: #ffffff;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            border: 1px solid #edf2f7;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .floor-svg, .floor-real-img {
+            width: 100%;
+            height: 100%;
+            display: block;
+            object-fit: contain;
+        }
+
+        .zoom-hint {
+            position: absolute;
+            bottom: 6px;
+            right: 6px;
+            background: rgba(0,0,0,0.65);
+            color: white;
+            font-size: 0.65rem;
+            padding: 3px 6px;
+            border-radius: 4px;
+            pointer-events: none;
+        }
+
+        .floor-info-desc {
+            width: 100%;
+            text-align: left;
+        }
+
+        .floor-map-title {
+            font-weight: bold;
+            color: var(--primary-green);
+            font-size: 0.82rem;
+            margin-bottom: 3px;
+        }
+
+        .floor-map-desc {
+            font-size: 0.75rem;
+            color: #4a5568;
+            line-height: 1.35;
+        }
+
+        .evac-box {
+            background-color: #fdf2f2;
+            border: 1px solid #f5c6cb;
+            border-radius: 8px;
+            padding: 8px 10px;
+            font-size: 0.75rem;
+            color: #721c24;
+            line-height: 1.4;
+        }
+
+        /* [핵심 수정] 하단 액션 바: 잘림 방지 및 노치/홈바 안전 영역 확보 */
+        .action-bar {
+            display: flex;
+            gap: 8px;
+            padding: 10px 12px;
+            padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px)); /* 아이폰 하단 영역 대응 */
+            background-color: white;
+            border-top: 1px solid #e2e8f0;
+            flex-shrink: 0;
+            z-index: 10;
+            box-shadow: 0 -3px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 12px 10px;
+            border-radius: 8px;
+            border: none;
+            font-size: 0.85rem;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .btn-call {
+            background-color: #f1f8f6;
+            color: var(--primary-green);
+            border: 1px solid #c8e6c9;
+        }
+
+        .btn-chat {
+            background-color: var(--accent-green);
+            color: white;
+        }
+
+        /* 전화 문의 모달 */
+        .overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 20;
+        }
+        .overlay.active { display: flex; }
+
+        .call-modal {
+            background: white;
+            width: 88%;
+            max-height: 80vh;
+            border-radius: 16px;
+            padding: 16px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+        }
+        .call-modal h3 { font-size: 0.95rem; color: var(--primary-green); margin-bottom: 10px; flex-shrink: 0; }
+        .call-list { overflow-y: auto; flex: 1; padding-right: 2px; margin-bottom: 8px; }
+        .call-option-btn {
+            display: block; width: 100%; padding: 9px 10px; margin-bottom: 6px;
+            background: #f8fafc; border: 1px solid #cbd5e0; border-radius: 8px;
+            color: #2d3748; text-decoration: none; font-size: 0.8rem; font-weight: bold; text-align: left;
+        }
+        .call-option-btn span { display: block; font-size: 0.68rem; color: #718096; font-weight: normal; margin-top: 2px; }
+        .call-close-btn { width: 100%; padding: 8px; background: #edf2f7; border: none; border-radius: 6px; font-size: 0.78rem; font-weight: bold; color: #4a5568; cursor: pointer; }
+
+        /* 평면도 확대 모달 */
+        .img-modal-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.92);
+            display: none;
+            flex-direction: column;
+            z-index: 30;
+            overflow: hidden;
+            user-select: none;
+        }
+        .img-modal-overlay.active { display: flex; }
+        .img-modal-header {
+            padding: 12px 16px; display: flex; justify-content: space-between; align-items: center;
+            color: white; font-size: 0.85rem; font-weight: bold; z-index: 32;
+            background: rgba(0,0,0,0.4);
+        }
+        .img-modal-close { background: none; border: none; color: white; font-size: 1.4rem; padding: 0 8px; cursor: pointer; }
+        
+        .img-modal-body {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+            touch-action: none;
+            cursor: grab;
+        }
+
+        .img-modal-body:active { cursor: grabbing; }
+        
+        #modalZoomWrapper {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transform-origin: center center;
+            will-change: transform;
+        }
+
+        #modalZoomWrapper img, #modalZoomWrapper svg {
+            max-width: 95%;
+            max-height: 95%;
+            object-fit: contain;
+            pointer-events: none;
+        }
+
+        .zoom-controls {
+            position: absolute;
+            bottom: 35px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            z-index: 32;
+            background: rgba(0,0,0,0.6);
+            padding: 6px 12px;
+            border-radius: 20px;
+        }
+
+        .zoom-btn {
+            background: white;
+            color: #2d3748;
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+        }
+
+        .zoom-reset-btn {
+            background: #cbd5e0;
+            color: #2d3748;
+            border: none;
+            padding: 0 10px;
+            height: 32px;
+            border-radius: 16px;
+            font-size: 0.72rem;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .img-modal-footer {
+            color: #a0aec0;
+            font-size: 0.68rem;
+            padding: 8px;
+            padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px));
+            text-align: center;
+            z-index: 32;
+            background: rgba(0,0,0,0.4);
+        }
+
+        /* AI 챗봇 모달 */
+        .chat-modal {
+            position: absolute; bottom: 0; left: 0; width: 100%; height: 85%;
+            background-color: white; border-top-left-radius: 20px; border-top-right-radius: 20px;
+            box-shadow: 0 -5px 20px rgba(0,0,0,0.15); display: flex; flex-direction: column;
+            transform: translateY(100%); transition: transform 0.3s ease-in-out; z-index: 15;
+            padding-bottom: env(safe-area-inset-bottom, 0px);
+        }
+        .chat-modal.active { transform: translateY(0); }
+        .chat-header { padding: 12px 16px; background-color: var(--primary-green); color: white; border-top-left-radius: 20px; border-top-right-radius: 20px; display: flex; justify-content: space-between; align-items: center; font-weight: bold; font-size: 0.85rem; }
+        .close-chat { background: none; border: none; color: white; font-size: 1.2rem; cursor: pointer; }
+        .chat-body { flex: 1; padding: 12px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; background-color: #f9fbf9; }
+        .chat-message { max-width: 85%; padding: 8px 12px; border-radius: 12px; font-size: 0.8rem; line-height: 1.4; }
+        .chat-message.bot { background-color: white; align-self: flex-start; border: 1px solid #e2e8f0; color: #2d3748; }
+        .chat-message.user { background-color: var(--accent-green); color: white; align-self: flex-end; }
+        .quick-chips { display: flex; gap: 6px; padding: 8px 10px; overflow-x: auto; background: #fff; border-top: 1px solid #edf2f7; -webkit-overflow-scrolling: touch; }
+        .quick-chips::-webkit-scrollbar { display: none; }
+        .chip { background: var(--light-green); color: var(--primary-green); border: 1px solid #c8e6c9; padding: 5px 9px; border-radius: 14px; font-size: 0.7rem; white-space: nowrap; cursor: pointer; font-weight: bold; flex-shrink: 0; }
+        .chat-footer { padding: 8px 12px; display: flex; gap: 6px; border-top: 1px solid #e2e8f0; background-color: white; }
+        .chat-footer input { flex: 1; padding: 8px 10px; border: 1px solid #cbd5e0; border-radius: 8px; outline: none; font-size: 0.8rem; }
+        .chat-footer button { padding: 8px 12px; background-color: var(--accent-green); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 0.8rem; }
+    </style>
+</head>
+<body>
+
+    <div class="phone-container">
+        <header>
+            <h1>🏟️ 화성종합경기타운</h1>
+            <p>스마트 통합 정보 안내</p>
+        </header>
+
+        <div class="content">
+            <!-- 1. 구글맵 위치 안내 -->
+            <div class="map-section">
+                <div class="section-title">
+                    <span>🗺️ 구글맵 위치</span>
+                    <span class="map-tag">✌️ 두 손가락으로 이동/확대</span>
+                </div>
+                <div class="google-map-box">
+                    <iframe 
+                        src="https://maps.google.com/maps?q=37.1375,126.9247&hl=ko&z=15&output=embed" 
+                        allowfullscreen 
+                        loading="eager"
+                        aria-hidden="false" 
+                        tabindex="0">
+                    </iframe>
+                </div>
+                <div class="gps-status-bar">
+                    📍 Google Maps: 화성종합경기타운 (경기도 화성시 향남읍 향남로 470)
+                </div>
+            </div>
+
+            <!-- 2. 층별 평면도 안내 -->
+            <div class="floor-section">
+                <div class="section-title">🏢 경기장 층별 평면도 및 시설 배치</div>
+                <div class="floor-tabs">
+                    <button class="floor-tab-btn" onclick="switchFloor('3f', this)">3층</button>
+                    <button class="floor-tab-btn" onclick="switchFloor('2f', this)">2층</button>
+                    <button class="floor-tab-btn active" id="defaultTab" onclick="switchFloor('1f', this)">1층</button>
+                    <button class="floor-tab-btn" onclick="switchFloor('b1', this)">지하1층</button>
+                </div>
+                
+                <div class="floor-map-display">
+                    <div class="floor-img-box" onclick="openImageModal()">
+                        <div id="svgContainer" style="width:100%; height:100%; display:flex; justify-content:center; align-items:center;"></div>
+                        <div class="zoom-hint">🔍 터치하여 확대 및 이동</div>
+                    </div>
+                    <div class="floor-info-desc" id="floorInfoDesc"></div>
+                </div>
+            </div>
+
+            <!-- 3. 비상대피로 안내 카드 -->
+            <div class="info-card">
+                <div class="section-title">🚨 비상대피로 안내</div>
+                <div class="evac-box">
+                    • <b>비상구 위치:</b> 2층 각 게이트(G1~G21) 통로 및 1층 외부 출입구 연결 비상계단 이용<br>
+                    • <b>대피 방향:</b> 비상시 외부 계단을 통해 <b>야외 주차장 및 광장 대피소</b>로 이동하세요.
+                </div>
+            </div>
+        </div>
+
+        <!-- 하단 액션 바 (화면 최하단에 항상 고정 표출) -->
+        <div class="action-bar">
+            <button class="action-btn btn-call" onclick="toggleCallModal()">📞 전화 문의</button>
+            <button class="action-btn btn-chat" onclick="toggleChat()">💬 AI 챗봇 상담</button>
+        </div>
+
+        <!-- 전화 문의 모달 팝업 -->
+        <div class="overlay" id="callOverlay">
+            <div class="call-modal">
+                <h3>📞 입주기관 및 주요 대표전화</h3>
+                <div class="call-list">
+                    <a href="tel:031-8012-7500" class="call-option-btn">🏢 화성도시공사 대표전화<span>031-8012-7500</span></a>
+                    <a href="tel:031-355-3500" class="call-option-btn">🏆 화성시체육회<span>031-355-3500</span></a>
+                    <a href="tel:031-8059-0676" class="call-option-btn">♿ 화성시장애인체육회<span>031-8059-0676</span></a>
+                    <a href="tel:031-366-4081" class="call-option-btn">⚽ 화성FC 사무국<span>031-366-4081</span></a>
+                    <a href="tel:031-8059-3195" class="call-option-btn">🚐 화성시 교통약자이동지원센터<span>031-8059-3195</span></a>
+                    <a href="tel:031-5189-6436" class="call-option-btn">👶 화성시 드림스타트센터<span>031-5189-6436</span></a>
+                    <a href="tel:031-120" class="call-option-btn">🏛️ 화성시청 콜센터 (만세구청)<span>031-120</span></a>
+                </div>
+                <button class="call-close-btn" onclick="toggleCallModal()">닫기</button>
+            </div>
+        </div>
+
+        <!-- 평면도 확대 모달 -->
+        <div class="img-modal-overlay" id="imgModalOverlay">
+            <div class="img-modal-header">
+                <span id="imgModalTitle">층별 안내도 확대</span>
+                <button class="img-modal-close" onclick="closeImageModal()">✕</button>
+            </div>
+            <div class="img-modal-body" id="modalTouchArea">
+                <div id="modalZoomWrapper"></div>
+            </div>
+
+            <div class="zoom-controls">
+                <button class="zoom-btn" onclick="adjustZoom(0.5)">+</button>
+                <button class="zoom-btn" onclick="adjustZoom(-0.5)">-</button>
+                <button class="zoom-reset-btn" onclick="resetZoom()">원래대로</button>
+            </div>
+
+            <div class="img-modal-footer">
+                * 핀치 줌 / 두 손가락으로 확대하고 드래그하여 상/하/좌/우 이동하세요.
+            </div>
+        </div>
+
+        <!-- AI 챗봇 모달 -->
+        <div class="chat-modal" id="chatModal">
+            <div class="chat-header">
+                <span>🤖 화성종합경기타운 AI 스마트 안내</span>
+                <button class="close-chat" onclick="toggleChat()">✕</button>
+            </div>
+            <div class="chat-body" id="chatBody">
+                <div class="chat-message bot">안녕하세요! 화성종합경기타운 스마트 안내 도우미입니다. 시설 배치, 입주기관 전화번호, 운영시간, 대관/강습, 주차 등에 대해 질문해 보세요.</div>
+            </div>
+            <div class="quick-chips">
+                <div class="chip" onclick="sendQuickMessage('입주기관 전화번호')">📞 입주기관 전화번호</div>
+                <div class="chip" onclick="sendQuickMessage('시설 소개')">🏟️ 주요 시설 안내</div>
+                <div class="chip" onclick="sendQuickMessage('운영시간')">⏰ 운영시간/휴관일</div>
+                <div class="chip" onclick="sendQuickMessage('대관 신청')">📋 대관 신청</div>
+                <div class="chip" onclick="sendQuickMessage('강습 프로그램')">👟 강습/수강신청</div>
+                <div class="chip" onclick="sendQuickMessage('주차 요금')">🚗 주차 안내</div>
+            </div>
+            <div class="chat-footer">
+                <input type="text" id="userInput" placeholder="궁금한 내용을 입력하세요..." onkeypress="if(event.key === 'Enter') sendMessage()">
+                <button onclick="sendMessage()">전송</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentFloorState = '1f';
+
+        const floorImageData = {
+            '1f': '1층.jpg',
+            '2f': '2층.jpg'
+        };
+
+        function getFloorContent(floorKey) {
+            if (floorKey === '1f' || floorKey === '2f') {
+                return `<img src="${floorImageData[floorKey]}" alt="${floorKey.toUpperCase()} 안내도" class="floor-real-img" onerror="this.onerror=null; this.src='https://via.placeholder.com/500?text=${floorKey.toUpperCase()}+Image+Not+Found';" />`;
+            }
+
+            const floorData = {
+                '3f': { title: "3F VIP & MEDIA", color: "#2d3748", sub: "VIP 참관석 / 미디어실" },
+                'b1': { title: "B1 PARKING & CONTROL", color: "#4a5568", sub: "지하주차장 / 방재실" }
+            };
+
+            const data = floorData[floorKey];
+            return `
+            <svg class="floor-svg" viewBox="0 0 500 500" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+                <rect width="500" height="500" fill="#ffffff"/>
+                <circle cx="250" cy="250" r="230" fill="none" stroke="#e2e8f0" stroke-width="8"/>
+                <circle cx="250" cy="250" r="210" fill="none" stroke="${data.color}" stroke-width="3" stroke-dasharray="6,6"/>
+                <rect x="140" y="100" width="220" height="300" rx="110" fill="#f8fafc" stroke="${data.color}" stroke-width="4"/>
+                <rect x="180" y="140" width="140" height="220" rx="70" fill="#e8f5e9" stroke="#2e8b57" stroke-width="2"/>
+                <text x="250" y="235" font-size="22" font-weight="bold" fill="${data.color}" text-anchor="middle">${data.title}</text>
+                <text x="250" y="265" font-size="11" fill="#718096" text-anchor="middle">${data.sub}</text>
+            </svg>`;
+        }
+
+        function switchFloor(floor, element) {
+            document.querySelectorAll('.floor-tab-btn').forEach(btn => btn.classList.remove('active'));
+            if(element) element.classList.add('active');
+
+            currentFloorState = floor;
+            document.getElementById('svgContainer').innerHTML = getFloorContent(floor);
+
+            const infoDesc = document.getElementById('floorInfoDesc');
+            if (floor === '3f') {
+                infoDesc.innerHTML = `<div class="floor-map-title">🏟️ 3층 안내도 (방송/미디어실 및 VIP석)</div><div class="floor-map-desc">• 주요 시설: 상층 관람석, 방송/중계실, 기자회견실, VIP 참관석</div>`;
+            } else if (floor === '2f') {
+                infoDesc.innerHTML = `<div class="floor-map-title">🏟️ 2층 안내도 (관람석 및 편의시설)</div><div class="floor-map-desc">• 주요 시설: 매점, 다목적실, 물품보관소/안내소, 미아보호실, 의무실/수유실</div>`;
+            } else if (floor === '1f') {
+                infoDesc.innerHTML = `<div class="floor-map-title">🏟️ 1층 안내도 (선수단 및 행정/기관 시설)</div><div class="floor-map-desc">• 주요 시설: 화성도시공사, 화성시복지재단, 지역자활센터, 시푸른공원관리과 등 입주기관</div>`;
+            } else if (floor === 'b1') {
+                infoDesc.innerHTML = `<div class="floor-map-title">🏢 지하 1층 안내도 (지하주차장 및 중앙방재실)</div><div class="floor-map-desc">• 주요 시설: 지하 주차장 연결 통로, 기계실, 전기실, 중앙 방재실</div>`;
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const defaultBtn = document.getElementById('defaultTab');
+            switchFloor('1f', defaultBtn);
+        });
+
+        function toggleCallModal() { document.getElementById('callOverlay').classList.toggle('active'); }
+        function toggleChat() { document.getElementById('chatModal').classList.toggle('active'); }
+
+        // 평면도 확대 및 터치 제어
+        let scale = 1;
+        let translateX = 0;
+        let translateY = 0;
+        let isDragging = false;
+        let startX = 0, startY = 0;
+        let initialPinchDistance = 0, initialScale = 1;
+
+        const zoomWrapper = document.getElementById('modalZoomWrapper');
+        const touchArea = document.getElementById('modalTouchArea');
+
+        function updateTransform() {
+            zoomWrapper.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
+        }
+
+        function resetZoom() {
+            scale = 1; translateX = 0; translateY = 0;
+            updateTransform();
+        }
+
+        function adjustZoom(delta) {
+            scale = Math.max(1, Math.min(scale + delta, 4));
+            if (scale === 1) { translateX = 0; translateY = 0; }
+            updateTransform();
+        }
+
+        function openImageModal() {
+            zoomWrapper.innerHTML = getFloorContent(currentFloorState);
+            document.getElementById('imgModalTitle').innerText = `${currentFloorState.toUpperCase()} 상세 안내도`;
+            document.getElementById('imgModalOverlay').classList.add('active');
+            resetZoom();
+        }
+
+        function closeImageModal() {
+            document.getElementById('imgModalOverlay').classList.remove('active');
+        }
+
+        touchArea.addEventListener('touchstart', (e) => {
+            if (e.touches.length === 1) {
+                isDragging = true;
+                startX = e.touches[0].clientX - translateX;
+                startY = e.touches[0].clientY - translateY;
+            } else if (e.touches.length === 2) {
+                isDragging = false;
+                initialPinchDistance = Math.hypot(
+                    e.touches[0].clientX - e.touches[1].clientX,
+                    e.touches[0].clientY - e.touches[1].clientY
+                );
+                initialScale = scale;
+            }
+        });
+
+        touchArea.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            if (e.touches.length === 1 && isDragging && scale > 1) {
+                translateX = e.touches[0].clientX - startX;
+                translateY = e.touches[0].clientY - startY;
+                updateTransform();
+            } else if (e.touches.length === 2 && initialPinchDistance > 0) {
+                const currentDist = Math.hypot(
+                    e.touches[0].clientX - e.touches[1].clientX,
+                    e.touches[0].clientY - e.touches[1].clientY
+                );
+                scale = Math.max(1, Math.min(initialScale * (currentDist / initialPinchDistance), 4));
+                if (scale === 1) { translateX = 0; translateY = 0; }
+                updateTransform();
+            }
+        }, { passive: false });
+
+        touchArea.addEventListener('touchend', (e) => {
+            if (e.touches.length === 0) {
+                isDragging = false;
+                initialPinchDistance = 0;
+            }
+        });
+
+        function sendQuickMessage(text) {
+            document.getElementById('userInput').value = text;
+            sendMessage();
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('userInput');
+            const chatBody = document.getElementById('chatBody');
+            const text = input.value.trim();
+            if (!text) return;
+
+            const userMsg = document.createElement('div');
+            userMsg.className = 'chat-message user';
+            userMsg.innerText = text;
+            chatBody.appendChild(userMsg);
+            input.value = '';
+            chatBody.scrollTop = chatBody.scrollHeight;
+
+            setTimeout(() => {
+                const botMsg = document.createElement('div');
+                botMsg.className = 'chat-message bot';
+                botMsg.innerHTML = `💬 하단 **[📞 전화 문의]** 버튼을 누르시면 각 입주기관으로 바로 전화 연결이 가능합니다.`;
+                chatBody.appendChild(botMsg);
+                chatBody.scrollTop = chatBody.scrollHeight;
+            }, 300);
+        }
+    </script>
+</body>
+</html>
