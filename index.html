@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
-    <title>화성종합경기타운 스마트 AI 통합 안내</title>
+    <title>화성종합경기타운 스마트 통합 안내</title>
     <style>
         :root {
             --primary-green: #1b4d3e;
@@ -11,6 +11,12 @@
             --light-green: #e8f5e9;
             --bg-color: #f4f7f5;
             --text-color: #2c3e50;
+            
+            /* 혼잡도 상태 색상 */
+            --status-smooth: #2e7d32; /* 여유: 녹색 */
+            --status-normal: #f57c00; /* 보통: 주황색 */
+            --status-busy: #d32f2f;   /* 혼잡: 빨간색 */
+            --status-full: #7b1fa2;   /* 만차: 보라색 */
         }
 
         * {
@@ -94,17 +100,17 @@
             justify-content: space-between;
         }
 
-        .map-section, .floor-section, .info-card {
+        .map-section, .floor-section, .info-card, .congestion-card {
             background-color: white;
             border-radius: 12px;
             padding: 10px;
             box-shadow: 0 2px 6px rgba(0,0,0,0.04);
         }
 
-        /* 구글맵 조작 영역 (터치 터널링 설정) */
+        /* 구글맵 조작 영역 */
         .google-map-box {
             width: 100%;
-            height: 220px;
+            height: 200px;
             border-radius: 8px;
             overflow: hidden;
             border: 1px solid #cbd5e0;
@@ -142,7 +148,120 @@
             border: 1px solid #c8e6c9;
         }
 
-        /* 경기장 구분 탭 (주경기장 vs 실내체육관) */
+        /* ------------------ 실시간 혼잡도 위젯 스타일 ------------------ */
+        .live-badge {
+            font-size: 0.65rem;
+            background: #ffebee;
+            color: #c62828;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .live-dot {
+            width: 6px;
+            height: 6px;
+            background-color: #e53935;
+            border-radius: 50%;
+            display: inline-block;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(1.2); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        .congestion-item {
+            background: #f8fafc;
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 8px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .congestion-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .congestion-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-bottom: 6px;
+        }
+
+        .status-tag {
+            padding: 3px 8px;
+            border-radius: 12px;
+            color: white;
+            font-size: 0.7rem;
+            font-weight: bold;
+        }
+
+        .status-tag.smooth { background-color: var(--status-smooth); }
+        .status-tag.normal { background-color: var(--status-normal); }
+        .status-tag.busy { background-color: var(--status-busy); }
+        .status-tag.full { background-color: var(--status-full); }
+
+        .progress-bar-bg {
+            width: 100%;
+            height: 8px;
+            background-color: #e2e8f0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 6px;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.4s ease, background-color 0.4s ease;
+        }
+
+        .congestion-detail {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.7rem;
+            color: #718096;
+        }
+
+        .gate-status-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 6px;
+            margin-top: 6px;
+        }
+
+        .gate-box {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 6px 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.72rem;
+        }
+
+        .admin-trigger-btn {
+            font-size: 0.68rem;
+            color: #718096;
+            background: none;
+            border: none;
+            text-decoration: underline;
+            cursor: pointer;
+            padding: 2px 0;
+        }
+        /* ----------------------------------------------------------------- */
+
+        /* 경기장 구분 탭 */
         .venue-tabs {
             display: flex;
             gap: 6px;
@@ -211,7 +330,7 @@
         .floor-img-box {
             width: 100%;
             aspect-ratio: 1 / 1;
-            max-height: 250px;
+            max-height: 230px;
             border-radius: 6px;
             background-color: #ffffff;
             margin-bottom: 8px;
@@ -342,6 +461,38 @@
         }
         .call-option-btn span { display: block; font-size: 0.68rem; color: #718096; font-weight: normal; margin-top: 2px; }
         .call-close-btn { width: 100%; padding: 8px; background: #edf2f7; border: none; border-radius: 6px; font-size: 0.78rem; font-weight: bold; color: #4a5568; cursor: pointer; }
+
+        /* 관리자 혼잡도 제어 모달 */
+        .admin-modal {
+            background: white;
+            width: 90%;
+            border-radius: 16px;
+            padding: 16px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .admin-modal h3 {
+            font-size: 0.9rem;
+            color: var(--primary-green);
+            text-align: center;
+        }
+
+        .admin-control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            font-size: 0.75rem;
+        }
+
+        .admin-control-group select {
+            padding: 6px;
+            border-radius: 6px;
+            border: 1px solid #cbd5e0;
+            font-size: 0.78rem;
+        }
 
         /* 평면도 확대 모달 */
         .img-modal-overlay {
@@ -475,11 +626,12 @@
         </header>
 
         <div class="content">
-            <!-- 1. 구글맵 위치 안내 (메인 화면에서 바로 확대/축소 가능하도록 URL 및 제스처 구성 업데이트) -->
+
+            <!-- 1. [최상단 배치] 구글맵 위치 및 오시는 길 -->
             <div class="map-section">
                 <div class="section-title">
                     <span>🗺️ 위치 및 오시는 길</span>
-                    <span class="map-tag">✌️ 화면에서 바로 확대/축소 가능</span>
+                    <span class="map-tag">✌️ 지도 확대/축소 가능</span>
                 </div>
                 <div class="google-map-box">
                     <iframe 
@@ -496,7 +648,48 @@
                 </div>
             </div>
 
-            <!-- 2. 경기장 층별 평면도 및 시설 배치 (주경기장 / 실내체육관 탭 구조) -->
+            <!-- 2. [두 번째 배치] 실시간 주차장 및 게이트 혼잡도 위젯 -->
+            <div class="congestion-card">
+                <div class="section-title">
+                    <span>🚗 실시간 주차 및 혼잡도</span>
+                    <span class="live-badge"><span class="live-dot"></span><span id="updateTimeTxt">LIVE 14:30</span></span>
+                </div>
+
+                <!-- 주차장 혼잡도 -->
+                <div class="congestion-item">
+                    <div class="congestion-header">
+                        <span>P1 ~ P3 야외 주차장</span>
+                        <span class="status-tag smooth" id="parkingStatusTag">여유 (75%)</span>
+                    </div>
+                    <div class="progress-bar-bg">
+                        <div class="progress-bar-fill" id="parkingBarFill" style="width: 25%; background-color: var(--status-smooth);"></div>
+                    </div>
+                    <div class="congestion-detail">
+                        <span>총 1,783면</span>
+                        <span id="parkingAvailTxt">주차 가능: <b>약 1,330대</b></span>
+                    </div>
+                </div>
+
+                <!-- 출입 게이트 혼잡도 -->
+                <div class="congestion-item" style="margin-bottom:0;">
+                    <div class="congestion-header" style="margin-bottom:4px;">
+                        <span>주요 출입 게이트 혼잡도</span>
+                        <button class="admin-trigger-btn" onclick="toggleAdminModal()">⚙️ 혼잡도 설정</button>
+                    </div>
+                    <div class="gate-status-grid">
+                        <div class="gate-box">
+                            <span>남문(주출입구)</span>
+                            <span class="status-tag normal" id="gate1Tag" style="padding: 1px 6px; font-size:0.65rem;">보통</span>
+                        </div>
+                        <div class="gate-box">
+                            <span>동문(체육관)</span>
+                            <span class="status-tag smooth" id="gate2Tag" style="padding: 1px 6px; font-size:0.65rem;">여유</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. 경기장 층별 평면도 및 시설 배치 (주경기장 / 실내체육관 탭 구조) -->
             <div class="floor-section">
                 <div class="section-title">🏢 경기장 층별 평면도 및 시설 배치</div>
                 
@@ -521,7 +714,7 @@
                 </div>
             </div>
 
-            <!-- 3. 비상대피로 안내 카드 -->
+            <!-- 4. 비상대피로 안내 카드 -->
             <div class="info-card">
                 <div class="section-title">🚨 비상대피로 안내</div>
                 <div class="evac-box">
@@ -552,6 +745,43 @@
                     <a href="tel:031-120" class="call-option-btn">🏛️ 화성시청 콜센터<span>031-120</span></a>
                 </div>
                 <button class="call-close-btn" onclick="toggleCallModal()">닫기</button>
+            </div>
+        </div>
+
+        <!-- 관리자 혼잡도 변경 모달 (A방식 테스트용) -->
+        <div class="overlay" id="adminOverlay">
+            <div class="admin-modal">
+                <h3>⚙️ 실시간 혼잡도 관리자 설정 (A방식)</h3>
+                
+                <div class="admin-control-group">
+                    <label><b>주차장 혼잡도 상태 선택:</b></label>
+                    <select id="adminParkingSelect" onchange="updateParkingStatus(this.value)">
+                        <option value="smooth">🟢 여유 (주차 가능 75%)</option>
+                        <option value="normal">🟡 보통 (주차 가능 35%)</option>
+                        <option value="busy">🔴 혼잡 (주차 가능 10%)</option>
+                        <option value="full">🟣 만차 (주차 가능 0%)</option>
+                    </select>
+                </div>
+
+                <div class="admin-control-group">
+                    <label><b>남문(주출입구) 상태:</b></label>
+                    <select id="adminGate1Select" onchange="updateGateStatus('gate1Tag', this.value)">
+                        <option value="smooth">여유</option>
+                        <option value="normal" selected>보통</option>
+                        <option value="busy">혼잡</option>
+                    </select>
+                </div>
+
+                <div class="admin-control-group">
+                    <label><b>동문(체육관) 상태:</b></label>
+                    <select id="adminGate2Select" onchange="updateGateStatus('gate2Tag', this.value)">
+                        <option value="smooth" selected>여유</option>
+                        <option value="normal">보통</option>
+                        <option value="busy">혼잡</option>
+                    </select>
+                </div>
+
+                <button class="call-close-btn" onclick="toggleAdminModal()" style="margin-top: 6px;">적용 및 닫기</button>
             </div>
         </div>
 
@@ -601,26 +831,14 @@
 
     <script>
         // 경기장 및 층 상태 관리
-        let currentVenue = 'main'; // 'main' (주경기장) 또는 'indoor' (실내체육관)
+        let currentVenue = 'main';
         let currentFloor = '1f';
 
-        // 경기장별 층 데이터 및 실제 이미지 매핑
         const stadiumImageData = {
-            main: {
-                '3f': 'main-3f.jpg',
-                '2f': '2층.jpg',
-                '1f': '1층.jpg',
-                'b1': 'main-b1.jpg'
-            },
-            indoor: {
-                '3f': 'indoor-3f.jpg',
-                '2f': 'indoor-2f.jpg',
-                '1f': 'indoor-1f.jpg',
-                'b1': 'indoor-b1.jpg'
-            }
+            main: { '3f': 'main-3f.jpg', '2f': '2층.jpg', '1f': '1층.jpg', 'b1': 'main-b1.jpg' },
+            indoor: { '3f': 'indoor-3f.jpg', '2f': 'indoor-2f.jpg', '1f': 'indoor-1f.jpg', 'b1': 'indoor-b1.jpg' }
         };
 
-        // 경기장별 층 구성 정보
         const venueConfig = {
             main: {
                 name: "주경기장",
@@ -652,30 +870,19 @@
             }
         };
 
-        // 경기장 전환
         function switchVenue(venueKey) {
             currentVenue = venueKey;
-            
-            // 탭 활성화 스타일 업데이트
             document.getElementById('venueMainBtn').classList.toggle('active', venueKey === 'main');
             document.getElementById('venueIndoorBtn').classList.toggle('active', venueKey === 'indoor');
-
-            // 기본 층을 1층으로 설정
             currentFloor = '1f';
-
-            // 층 버튼 렌더링
             renderFloorTabs();
-            // 내용 업데이트
             updateFloorDisplay();
         }
 
-        // 층 선택 버튼 동적 생성
         function renderFloorTabs() {
             const container = document.getElementById('floorTabContainer');
             container.innerHTML = '';
             const floors = venueConfig[currentVenue].floors;
-
-            // 컬럼 개수에 맞게 Grid 스타일 조정
             container.style.gridTemplateColumns = `repeat(${floors.length}, 1fr)`;
 
             floors.forEach(f => {
@@ -687,7 +894,6 @@
             });
         }
 
-        // 층 선택 전환
         function switchFloor(floorId, element) {
             currentFloor = floorId;
             document.querySelectorAll('.floor-tab-btn').forEach(btn => btn.classList.remove('active'));
@@ -695,10 +901,8 @@
             updateFloorDisplay();
         }
 
-        // 층별 그래픽/이미지 및 설명 업데이트
         function updateFloorDisplay() {
             document.getElementById('svgContainer').innerHTML = getFloorContent(currentVenue, currentFloor);
-            
             const descData = venueConfig[currentVenue].descriptions[currentFloor];
             const infoDesc = document.getElementById('floorInfoDesc');
             if (descData) {
@@ -708,14 +912,12 @@
             }
         }
 
-        // 이미지 HTML 또는 SVG 폴백 반환
         function getFloorContent(venue, floor) {
             const imgFileName = stadiumImageData[venue] ? stadiumImageData[venue][floor] : null;
 
             if ((venue === 'main' && (floor === '1f' || floor === '2f')) && imgFileName) {
                 return `<img src="${imgFileName}" alt="${venueConfig[venue].name} ${floor.toUpperCase()} 안내도" class="floor-real-img" onerror="this.onerror=null; this.parentElement.innerHTML=getFallbackSvg('${venue}', '${floor}');" />`;
             }
-
             return getFallbackSvg(venue, floor);
         }
 
@@ -733,6 +935,57 @@
             </svg>`;
         }
 
+        // --- [A방식] 실시간 혼잡도 관리 함수 ---
+        function updateParkingStatus(status) {
+            const tag = document.getElementById('parkingStatusTag');
+            const fill = document.getElementById('parkingBarFill');
+            const availTxt = document.getElementById('parkingAvailTxt');
+            const timeTxt = document.getElementById('updateTimeTxt');
+
+            const now = new Date();
+            const timeStr = `LIVE ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+            timeTxt.innerText = timeStr;
+
+            tag.className = 'status-tag ' + status;
+
+            if (status === 'smooth') {
+                tag.innerText = '여유 (75%)';
+                fill.style.width = '25%';
+                fill.style.backgroundColor = 'var(--status-smooth)';
+                availTxt.innerHTML = '주차 가능: <b>약 1,330대</b>';
+            } else if (status === 'normal') {
+                tag.innerText = '보통 (35%)';
+                fill.style.width = '65%';
+                fill.style.backgroundColor = 'var(--status-normal)';
+                availTxt.innerHTML = '주차 가능: <b>약 620대</b>';
+            } else if (status === 'busy') {
+                tag.innerText = '혼잡 (10%)';
+                fill.style.width = '90%';
+                fill.style.backgroundColor = 'var(--status-busy)';
+                availTxt.innerHTML = '주차 가능: <b>약 170대 (대중교통 권장)</b>';
+            } else if (status === 'full') {
+                tag.innerText = '만차 (0%)';
+                fill.style.width = '100%';
+                fill.style.backgroundColor = 'var(--status-full)';
+                availTxt.innerHTML = '주차 가능: <b style="color:red;">0대 (주차장 만차)</b>';
+            }
+        }
+
+        function updateGateStatus(targetId, status) {
+            const tag = document.getElementById(targetId);
+            tag.className = 'status-tag ' + status;
+            tag.style.padding = '1px 6px';
+            tag.style.fontSize = '0.65rem';
+
+            if (status === 'smooth') tag.innerText = '여유';
+            else if (status === 'normal') tag.innerText = '보통';
+            else if (status === 'busy') tag.innerText = '혼잡';
+        }
+
+        function toggleAdminModal() {
+            document.getElementById('adminOverlay').classList.toggle('active');
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             switchVenue('main');
         });
@@ -740,7 +993,7 @@
         function toggleCallModal() { document.getElementById('callOverlay').classList.toggle('active'); }
         function toggleChat() { document.getElementById('chatModal').classList.toggle('active'); }
 
-        // 평면도 모달 및 Zoom 제어 로직
+        // 평면도 모달 Zoom 제어
         let scale = 1, translateX = 0, translateY = 0, isDragging = false, startX = 0, startY = 0, initialPinchDistance = 0, initialScale = 1;
         const zoomWrapper = document.getElementById('modalZoomWrapper');
         const touchArea = document.getElementById('modalTouchArea');
@@ -793,7 +1046,6 @@
             sendMessage();
         }
 
-        // 챗봇 응답 로직
         function sendMessage() {
             const input = document.getElementById('userInput');
             const chatBody = document.getElementById('chatBody');
@@ -810,44 +1062,19 @@
             setTimeout(() => {
                 const botMsg = document.createElement('div');
                 botMsg.className = 'chat-message bot';
-                
                 let responseText = "";
 
                 if (query.includes("주차") || query.includes("요금") || query.includes("차량")) {
                     responseText = `🚗 <b>주차장 이용 안내 (화성도시공사)</b><br><br>` +
                         `• <b>주차 요금:</b> <b>무료</b><br>` +
                         `• <b>총 주차 대수:</b> 1,783대 수용 가능<br>` +
-                        `• <b>전용 주차:</b> 장애인용 108면, 버스 25면, 전기차 충전소 41대, 친환경 50대 포함<br>` +
-                        `• 경기나 행사 개최 시 차량 이동에 유의해 주시기 바랍니다.`;
-                } else if (query.includes("시설") || query.includes("경기장") || query.includes("소개") || query.includes("체육관")) {
+                        `• <b>실시간 현황:</b> 상단 실시간 혼잡도 위젯에서 남은 주차면수를 확인하세요!`;
+                } else if (query.includes("시설") || query.includes("경기장") || query.includes("소개")) {
                     responseText = `🏟️ <b>화성종합경기타운 시설 개요</b><br><br>` +
-                        `• <b>주경기장:</b> 총 35,270석 (천연잔디 규격 105m×68m, 400m 8레인 트랙, K리그2 화성FC 홈구장)<br>` +
-                        `• <b>실내체육관:</b> 총 5,152석 (농구, 배구, 배드민턴 등 멀티 경기장)<br>` +
-                        `• <b>보조경기장:</b> 총 2,002석 (천연잔디 필드 및 8레인 육상 트랙)`;
-                } else if (query.includes("대관") || query.includes("예약") || query.includes("신청")) {
-                    responseText = `📋 <b>경기장 대관 신청 안내</b><br><br>` +
-                        `• <b>신청 방법:</b> <i>화성특례시 통합예약시스템</i>(yeyak.hscity.go.kr)을 통해 온라인 신청<br>` +
-                        `• <b>접수 일정:</b><br>` +
-                        ` - 화성시 관내 주민: 전월 28일 10시부터<br>` +
-                        ` - 관외 주민: 전월 7일 10시부터<br>` +
-                        `• 자세한 문의: 경기타운 대관 담당자(031-371-0011)`;
-                } else if (query.includes("전화") || query.includes("번호") || query.includes("입주") || query.includes("기관")) {
-                    responseText = `📞 <b>주요 입주기관 연락처</b><br><br>` +
-                        `• 화성도시공사 대표: 031-8012-7500<br>` +
-                        `• 경기타운 관리사무실: 031-371-0011<br>` +
-                        `• 화성시체육회: 031-355-3500<br>` +
-                        `• 화성시장애인체육회: 031-8059-0676<br>` +
-                        `• 화성FC 사무국: 031-366-4081<br>` +
-                        `• 교통약자이동지원센터: 031-8059-3195<br>` +
-                        `* 화면 하단 <b>[📞 전화 문의]</b> 버튼을 누르면 바로 연결 가능합니다.`;
-                } else if (query.includes("위치") || query.includes("오시는") || query.includes("주소") || query.includes("버스")) {
-                    responseText = `📍 <b>위치 및 오시는 길</b><br><br>` +
-                        `• <b>주소:</b> 경기도 화성시 향남읍 향남로 470 (화성종합경기타운)<br>` +
-                        `• <b>대중교통:</b> 향남역 및 향남환승터미널 하차 후 시내버스 이용 (화성종합경기타운 정류장 하차)`;
+                        `• <b>주경기장:</b> 총 35,270석 (천연잔디, K리그2 화성FC 홈구장)<br>` +
+                        `• <b>실내체육관:</b> 총 5,152석 (농구, 배구, 배드민턴 등)`;
                 } else {
-                    responseText = `🤖 요청하신 내용에 대한 안내입니다.<br><br>` +
-                        `화성종합경기타운은 <b>화성도시공사</b>에서 위탁 관리하고 있으며, 주차는 <b>무료</b>입니다.<br>` +
-                        `추가 문의사항은 관리사무실(031-371-0011) 또는 화성시청 콜센터(031-120)로 문의하시면 친절히 안내받으실 수 있습니다.`;
+                    responseText = `🤖 화성종합경기타운 안내입니다.<br>추가 문의사항은 관리사무실(031-371-0011)로 문의해 주세요.`;
                 }
 
                 botMsg.innerHTML = responseText;
