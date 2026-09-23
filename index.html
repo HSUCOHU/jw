@@ -574,16 +574,16 @@
         let currentVenue = 'main';
         let currentFloor = '1f';
 
-        // ★ 새롭게 제공된 도면 이미지 파일명(_3.jpg)으로 매핑 완료
+        // 영문 파일명으로 매핑 변경
         const stadiumImageData = {
             main: { 
-                '3f': '주경기장3층_3.jpg', 
-                '2f': '주경기장2층_3.jpg', 
-                '1f': '주경기장1층_3.jpg' 
+                '3f': 'main_3f.jpg', 
+                '2f': 'main_2f.jpg', 
+                '1f': 'main_1f.jpg' 
             },
             indoor: { 
-                '2f': '실내체육관2층_3.jpg', 
-                '1f': '실내체육관1층_3.jpg' 
+                '2f': 'indoor_2f.jpg', 
+                '1f': 'indoor_1f.jpg' 
             }
         };
 
@@ -622,7 +622,6 @@
             const container = document.getElementById('floorTabContainer');
             container.innerHTML = '';
             const floors = venueConfig[currentVenue].floors;
-            // 층 개수에 맞춰 탭 컬럼 비율을 자동 조정
             container.style.gridTemplateColumns = `repeat(${floors.length}, 1fr)`;
 
             floors.forEach(f => {
@@ -650,7 +649,6 @@
             }
         }
 
-        // 이미지 파일명이 있으면 무조건 이미지를 보여주도록 구현
         function getFloorContent(venue, floor) {
             const imgFileName = stadiumImageData[venue] ? stadiumImageData[venue][floor] : null;
             if (imgFileName) {
@@ -675,7 +673,6 @@
         function toggleCallModal() { document.getElementById('callOverlay').classList.toggle('active'); }
         function toggleChat() { document.getElementById('chatModal').classList.toggle('active'); }
 
-        // 평면도 모달 Zoom
         let scale = 1, translateX = 0, translateY = 0, isDragging = false, startX = 0, startY = 0, initialPinchDistance = 0, initialScale = 1;
         const zoomWrapper = document.getElementById('modalZoomWrapper');
         const touchArea = document.getElementById('modalTouchArea');
