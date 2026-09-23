@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>화성종합경기타운 스마트 통합 안내</title>
     <style>
         :root {
@@ -21,21 +21,23 @@
             -webkit-tap-highlight-color: transparent;
         }
 
+        /* 모바일 전체 화면 대응 레이아웃 수정 */
         html, body {
             width: 100%;
-            height: 100%;
-            overflow: hidden;
-            background-color: #d1d8d3;
+            min-height: 100%;
+            height: 100vh;
+            height: 100dvh;
+            background-color: var(--bg-color);
             color: var(--text-color);
             display: flex;
             justify-content: center;
             align-items: center;
+            overflow: hidden;
         }
 
         .phone-container {
             width: 100%;
-            height: 100vh;
-            height: 100dvh;
+            height: 100%;
             max-width: 480px;
             background-color: #ffffff;
             display: flex;
@@ -57,35 +59,35 @@
         header {
             background-color: var(--primary-green);
             color: white;
-            padding: 14px 16px;
+            padding: 12px 16px;
             text-align: center;
             flex-shrink: 0;
             z-index: 5;
         }
 
         header h1 {
-            font-size: 1.1rem;
+            font-size: 1.05rem;
             margin-bottom: 2px;
         }
 
         header p {
-            font-size: 0.72rem;
+            font-size: 0.7rem;
             opacity: 0.85;
         }
 
         .content {
             flex: 1;
             overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
             padding: 12px;
             display: flex;
             flex-direction: column;
             gap: 12px;
             background-color: var(--bg-color);
-            -webkit-overflow-scrolling: touch;
         }
 
         .section-title {
-            font-size: 0.85rem;
+            font-size: 0.82rem;
             font-weight: bold;
             margin-bottom: 8px;
             color: var(--primary-green);
@@ -99,12 +101,13 @@
             border-radius: 12px;
             padding: 10px;
             box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+            flex-shrink: 0;
         }
 
         /* 구글맵 조작 영역 */
         .google-map-box {
             width: 100%;
-            height: 220px;
+            height: 200px;
             border-radius: 8px;
             overflow: hidden;
             border: 1px solid #cbd5e0;
@@ -133,7 +136,7 @@
             border: 1px solid var(--primary-green);
             color: var(--primary-green);
             border-radius: 6px;
-            font-size: 0.75rem;
+            font-size: 0.73rem;
             font-weight: bold;
             cursor: pointer;
             display: flex;
@@ -151,7 +154,7 @@
             color: var(--primary-green);
             padding: 6px 8px;
             border-radius: 6px;
-            font-size: 0.72rem;
+            font-size: 0.7rem;
             font-weight: bold;
             text-align: center;
             border: 1px solid #c8e6c9;
@@ -174,7 +177,7 @@
             background-color: #f8fafc;
             color: #4a5568;
             border-radius: 8px;
-            font-size: 0.82rem;
+            font-size: 0.8rem;
             font-weight: bold;
             cursor: pointer;
             text-align: center;
@@ -199,7 +202,7 @@
             color: #4a5568;
             padding: 7px 0;
             border-radius: 6px;
-            font-size: 0.75rem;
+            font-size: 0.73rem;
             font-weight: bold;
             cursor: pointer;
             text-align: center;
@@ -224,7 +227,7 @@
         .floor-img-box {
             width: 100%;
             aspect-ratio: 1 / 1;
-            max-height: 230px;
+            max-height: 210px;
             border-radius: 6px;
             background-color: #ffffff;
             margin-bottom: 8px;
@@ -250,7 +253,7 @@
             right: 6px;
             background: rgba(0,0,0,0.65);
             color: white;
-            font-size: 0.65rem;
+            font-size: 0.62rem;
             padding: 3px 6px;
             border-radius: 4px;
             pointer-events: none;
@@ -264,12 +267,12 @@
         .floor-map-title {
             font-weight: bold;
             color: var(--primary-green);
-            font-size: 0.82rem;
+            font-size: 0.8rem;
             margin-bottom: 3px;
         }
 
         .floor-map-desc {
-            font-size: 0.75rem;
+            font-size: 0.73rem;
             color: #4a5568;
             line-height: 1.35;
         }
@@ -279,7 +282,7 @@
             border: 1px solid #f5c6cb;
             border-radius: 8px;
             padding: 8px 10px;
-            font-size: 0.75rem;
+            font-size: 0.73rem;
             color: #721c24;
             line-height: 1.4;
         }
@@ -287,7 +290,7 @@
         /* 전기차 실시간 현황 영역 (P1, P3, P5) */
         .ev-refresh-btn {
             background: white; border: 1px solid #cbd5e0; border-radius: 4px;
-            padding: 3px 8px; font-size: 0.7rem; color: #4a5568; cursor: pointer;
+            padding: 3px 8px; font-size: 0.68rem; color: #4a5568; cursor: pointer;
             display: flex; align-items: center; gap: 4px; font-weight: bold;
         }
         .ev-refresh-btn:active { background: #f1f5f9; }
@@ -299,19 +302,19 @@
             padding: 8px 10px; display: flex; justify-content: space-between; align-items: center;
         }
         .ev-zone-info { display: flex; flex-direction: column; gap: 2px; }
-        .ev-zone { font-size: 0.78rem; font-weight: bold; color: #2d3748; }
-        .ev-types { font-size: 0.65rem; color: #718096; }
-        .ev-status { font-size: 0.75rem; color: #718096; text-align: right; }
-        .ev-status .avail { font-size: 0.85rem; font-weight: bold; color: var(--accent-green); }
-        .ev-status .full { font-size: 0.85rem; font-weight: bold; color: #e53e3e; }
-        .ev-note { font-size: 0.65rem; color: #a0aec0; text-align: right; margin-top: 6px; }
+        .ev-zone { font-size: 0.75rem; font-weight: bold; color: #2d3748; }
+        .ev-types { font-size: 0.62rem; color: #718096; }
+        .ev-status { font-size: 0.73rem; color: #718096; text-align: right; }
+        .ev-status .avail { font-size: 0.82rem; font-weight: bold; color: var(--accent-green); }
+        .ev-status .full { font-size: 0.82rem; font-weight: bold; color: #e53e3e; }
+        .ev-note { font-size: 0.62rem; color: #a0aec0; text-align: right; margin-top: 6px; }
 
         /* 하단 고정 액션 바 */
         .action-bar {
             display: flex;
             gap: 8px;
             padding: 10px 12px;
-            padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+            padding-bottom: max(10px, env(safe-area-inset-bottom, 10px));
             background-color: white;
             border-top: 1px solid #e2e8f0;
             flex-shrink: 0;
@@ -323,7 +326,7 @@
             padding: 12px 10px;
             border-radius: 8px;
             border: none;
-            font-size: 0.85rem;
+            font-size: 0.82rem;
             font-weight: bold;
             cursor: pointer;
             display: flex;
@@ -335,41 +338,41 @@
         .btn-call { background-color: #f1f8f6; color: var(--primary-green); border: 1px solid #c8e6c9; }
         .btn-chat { background-color: var(--accent-green); color: white; }
 
-        /* 모달 팝업 및 기타 스타일 동일 유지 */
-        .overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 20; }
+        /* 모달 팝업 및 오버레이 */
+        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 20; }
         .overlay.active { display: flex; }
         .call-modal { background: white; width: 88%; max-height: 80vh; border-radius: 16px; padding: 16px; text-align: center; display: flex; flex-direction: column; }
-        .call-modal h3 { font-size: 0.95rem; color: var(--primary-green); margin-bottom: 10px; }
+        .call-modal h3 { font-size: 0.92rem; color: var(--primary-green); margin-bottom: 10px; }
         .call-list { overflow-y: auto; flex: 1; margin-bottom: 8px; }
-        .call-option-btn { display: block; width: 100%; padding: 9px 10px; margin-bottom: 6px; background: #f8fafc; border: 1px solid #cbd5e0; border-radius: 8px; color: #2d3748; text-decoration: none; font-size: 0.8rem; font-weight: bold; text-align: left; }
-        .call-option-btn span { display: block; font-size: 0.68rem; color: #718096; font-weight: normal; margin-top: 2px; }
-        .call-close-btn { width: 100%; padding: 8px; background: #edf2f7; border: none; border-radius: 6px; font-size: 0.78rem; font-weight: bold; color: #4a5568; cursor: pointer; }
+        .call-option-btn { display: block; width: 100%; padding: 9px 10px; margin-bottom: 6px; background: #f8fafc; border: 1px solid #cbd5e0; border-radius: 8px; color: #2d3748; text-decoration: none; font-size: 0.78rem; font-weight: bold; text-align: left; }
+        .call-option-btn span { display: block; font-size: 0.65rem; color: #718096; font-weight: normal; margin-top: 2px; }
+        .call-close-btn { width: 100%; padding: 8px; background: #edf2f7; border: none; border-radius: 6px; font-size: 0.75rem; font-weight: bold; color: #4a5568; cursor: pointer; }
 
-        .img-modal-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.92); display: none; flex-direction: column; z-index: 30; overflow: hidden; }
+        .img-modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.92); display: none; flex-direction: column; z-index: 30; overflow: hidden; }
         .img-modal-overlay.active { display: flex; }
-        .img-modal-header { padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; color: white; font-size: 0.85rem; font-weight: bold; z-index: 32; background: rgba(0,0,0,0.4); }
+        .img-modal-header { padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; color: white; font-size: 0.82rem; font-weight: bold; z-index: 32; background: rgba(0,0,0,0.4); }
         .img-modal-close { background: none; border: none; color: white; font-size: 1.4rem; cursor: pointer; }
         .img-modal-body { flex: 1; display: flex; justify-content: center; align-items: center; overflow: hidden; position: relative; touch-action: none; }
         #modalZoomWrapper { width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; transform-origin: center center; }
         #modalZoomWrapper img, #modalZoomWrapper svg { max-width: 95%; max-height: 95%; object-fit: contain; pointer-events: none; }
         .zoom-controls { position: absolute; bottom: 35px; left: 50%; transform: translateX(-50%); display: flex; gap: 10px; z-index: 32; background: rgba(0,0,0,0.6); padding: 6px 12px; border-radius: 20px; }
-        .zoom-btn { background: white; color: #2d3748; border: none; width: 32px; height: 32px; border-radius: 50%; font-weight: bold; font-size: 1rem; cursor: pointer; }
-        .zoom-reset-btn { background: #cbd5e0; color: #2d3748; border: none; padding: 0 10px; height: 32px; border-radius: 16px; font-size: 0.72rem; font-weight: bold; cursor: pointer; }
+        .zoom-btn { background: white; color: #2d3748; border: none; width: 30px; height: 30px; border-radius: 50%; font-weight: bold; font-size: 0.95rem; cursor: pointer; }
+        .zoom-reset-btn { background: #cbd5e0; color: #2d3748; border: none; padding: 0 10px; height: 30px; border-radius: 15px; font-size: 0.7rem; font-weight: bold; cursor: pointer; }
 
-        .chat-modal { position: absolute; bottom: 0; left: 0; width: 100%; height: 85%; background-color: white; border-top-left-radius: 20px; border-top-right-radius: 20px; box-shadow: 0 -5px 20px rgba(0,0,0,0.15); display: flex; flex-direction: column; transform: translateY(100%); transition: transform 0.3s ease-in-out; z-index: 15; padding-bottom: env(safe-area-inset-bottom, 0px); }
+        .chat-modal { position: fixed; bottom: 0; left: 0; width: 100%; height: 85%; background-color: white; border-top-left-radius: 20px; border-top-right-radius: 20px; box-shadow: 0 -5px 20px rgba(0,0,0,0.15); display: flex; flex-direction: column; transform: translateY(100%); transition: transform 0.3s ease-in-out; z-index: 25; padding-bottom: env(safe-area-inset-bottom, 0px); }
         .chat-modal.active { transform: translateY(0); }
-        .chat-header { padding: 12px 16px; background-color: var(--primary-green); color: white; border-top-left-radius: 20px; border-top-right-radius: 20px; display: flex; justify-content: space-between; align-items: center; font-weight: bold; font-size: 0.85rem; }
+        .chat-header { padding: 12px 16px; background-color: var(--primary-green); color: white; border-top-left-radius: 20px; border-top-right-radius: 20px; display: flex; justify-content: space-between; align-items: center; font-weight: bold; font-size: 0.82rem; }
         .close-chat { background: none; border: none; color: white; font-size: 1.2rem; cursor: pointer; }
         .chat-body { flex: 1; padding: 12px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; background-color: #f9fbf9; }
-        .chat-message { max-width: 88%; padding: 9px 12px; border-radius: 12px; font-size: 0.8rem; line-height: 1.45; word-break: break-all; }
+        .chat-message { max-width: 88%; padding: 9px 12px; border-radius: 12px; font-size: 0.78rem; line-height: 1.45; word-break: break-all; }
         .chat-message.bot { background-color: white; align-self: flex-start; border: 1px solid #e2e8f0; color: #2d3748; }
         .chat-message.user { background-color: var(--accent-green); color: white; align-self: flex-end; }
         .quick-chips { display: flex; gap: 6px; padding: 8px 10px; overflow-x: auto; background: #fff; border-top: 1px solid #edf2f7; -webkit-overflow-scrolling: touch; }
         .quick-chips::-webkit-scrollbar { display: none; }
-        .chip { background: var(--light-green); color: var(--primary-green); border: 1px solid #c8e6c9; padding: 5px 9px; border-radius: 14px; font-size: 0.7rem; white-space: nowrap; cursor: pointer; font-weight: bold; flex-shrink: 0; }
+        .chip { background: var(--light-green); color: var(--primary-green); border: 1px solid #c8e6c9; padding: 5px 9px; border-radius: 14px; font-size: 0.68rem; white-space: nowrap; cursor: pointer; font-weight: bold; flex-shrink: 0; }
         .chat-footer { padding: 8px 12px; display: flex; gap: 6px; border-top: 1px solid #e2e8f0; background-color: white; }
-        .chat-footer input { flex: 1; padding: 8px 10px; border: 1px solid #cbd5e0; border-radius: 8px; outline: none; font-size: 0.8rem; }
-        .chat-footer button { padding: 8px 12px; background-color: var(--accent-green); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 0.8rem; }
+        .chat-footer input { flex: 1; padding: 8px 10px; border: 1px solid #cbd5e0; border-radius: 8px; outline: none; font-size: 0.78rem; }
+        .chat-footer button { padding: 8px 12px; background-color: var(--accent-green); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 0.78rem; }
     </style>
 </head>
 <body>
@@ -386,7 +389,7 @@
             <div class="map-section">
                 <div class="section-title">
                     <span>🗺️ 실시간 위치 및 지도</span>
-                    <span style="font-size: 0.65rem; background: var(--light-green); color: var(--primary-green); padding: 2px 6px; border-radius: 4px; font-weight: bold;">💡 확대/축소 가능</span>
+                    <span style="font-size: 0.62rem; background: var(--light-green); color: var(--primary-green); padding: 2px 6px; border-radius: 4px; font-weight: bold;">💡 확대/축소 가능</span>
                 </div>
                 <div class="google-map-box">
                     <iframe 
@@ -513,14 +516,13 @@
     </div>
 
     <script>
-        // --- 1. 스마트폰 GPS 사용자 위치 확인 및 지도 반영 ---
         const stadiumLat = 37.1375;
         const stadiumLng = 126.9221251;
 
         document.addEventListener('DOMContentLoaded', () => {
             switchVenue('main');
             autoCheckLocation();
-            fetchEVChargingData(); // 초기 충전소 데이터 로드
+            fetchEVChargingData();
         });
 
         function autoCheckLocation() {
@@ -558,7 +560,6 @@
             updateMapLocation(stadiumLat, stadiumLng, "📍 화성종합경기타운 (경기장 기본 위치)");
         }
 
-        // --- 2. 층별 안내도 및 UI ---
         let currentVenue = 'main', currentFloor = '1f';
 
         const stadiumImageData = {
@@ -640,7 +641,6 @@
         function toggleCallModal() { document.getElementById('callOverlay').classList.toggle('active'); }
         function toggleChat() { document.getElementById('chatModal').classList.toggle('active'); }
 
-        // --- 3. 실시간 전기차 충전소 API 연동 프레임 (P1, P3, P5) ---
         function renderEVUI(dataList) {
             const container = document.getElementById('evGridContainer');
             container.innerHTML = '';
@@ -669,12 +669,6 @@
             noteEl.innerText = "⏳ 충전소 실시간 정보 동기화 중...";
 
             try {
-                // [추후 백엔드 또는 환경부 API 연동 구간]
-                // const response = await fetch('YOUR_SERVER_API_ENDPOINT_FOR_EV');
-                // const result = await response.json();
-                // renderEVUI(result);
-
-                // 현재는 API 연결 전이므로, 구조 파악용 데모 데이터를 시뮬레이션으로 바인딩합니다.
                 setTimeout(() => {
                     const mockApiData = [
                         { zoneName: 'P1 주차장', chargerTypes: '급속 / 완속', total: 4, available: Math.floor(Math.random() * 5) },
@@ -685,14 +679,12 @@
                     const nowStr = new Date().toLocaleTimeString();
                     noteEl.innerText = `🟢 마지막 갱신: ${nowStr} (무공해차 통합누리집 API 규격 호환)`;
                 }, 500);
-
             } catch (error) {
                 console.error("EV API Load Error:", error);
                 noteEl.innerText = "⚠️ 실시간 정보를 불러오지 못했습니다.";
             }
         }
 
-        // --- 평면도 확대 모달 스크립트 ---
         let scale = 1, translateX = 0, translateY = 0, isDragging = false, startX = 0, startY = 0, initialPinchDist = 0, initialScale = 1;
         const zoomWrapper = document.getElementById('modalZoomWrapper'), touchArea = document.getElementById('modalTouchArea');
 
@@ -721,7 +713,6 @@
         }, { passive: false });
         touchArea.addEventListener('touchend', () => { isDragging = false; initialPinchDist = 0; });
 
-        // --- AI 챗봇 ---
         function sendQuickMessage(text) { document.getElementById('userInput').value = text; sendMessage(); }
         function sendMessage() {
             const input = document.getElementById('userInput');
