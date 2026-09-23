@@ -5,42 +5,303 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>화성종합경기타운 스마트 통합 안내</title>
     <style>
-        /* (기존 CSS 스타일 동일 유지) */
-        :root { --primary-green: #1b4d3e; --accent-green: #2e8b57; --light-green: #e8f5e9; --bg-color: #f4f7f5; --text-color: #2c3e50; }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; -webkit-tap-highlight-color: transparent; }
-        html, body { width: 100%; height: 100%; height: 100dvh; background-color: var(--bg-color); color: var(--text-color); display: flex; justify-content: center; align-items: center; overflow: hidden; }
-        .phone-container { width: 100%; height: 100%; height: 100dvh; max-width: 480px; background-color: #ffffff; display: flex; flex-direction: column; position: relative; overflow: hidden; }
-        @media (min-width: 481px) { .phone-container { height: calc(100vh - 40px); max-height: 840px; border-radius: 35px; border: 12px solid #14382d; box-shadow: 0 10px 30px rgba(0,0,0,0.15); } }
-        header { background-color: var(--primary-green); color: white; padding: 10px 16px; text-align: center; flex-shrink: 0; z-index: 5; }
-        header h1 { font-size: 1rem; margin-bottom: 1px; }
-        header p { font-size: 0.68rem; opacity: 0.85; }
-        .content { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 12px 12px 80px 12px; display: flex; flex-direction: column; gap: 12px; background-color: var(--bg-color); }
-        .section-title { font-size: 0.82rem; font-weight: bold; margin-bottom: 8px; color: var(--primary-green); display: flex; align-items: center; justify-content: space-between; }
-        .map-section, .floor-section, .info-card { background-color: white; border-radius: 12px; padding: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.04); flex-shrink: 0; }
-        .google-map-box { width: 100%; height: 190px; border-radius: 8px; overflow: hidden; border: 1px solid #cbd5e0; position: relative; background: #e5e3df; }
-        .google-map-box iframe { width: 100%; height: 100%; border: 0; pointer-events: auto !important; touch-action: auto !important; }
-        .map-tools { display: flex; gap: 6px; margin-top: 8px; }
-        .gps-btn { flex: 1; padding: 8px; background: #ffffff; border: 1px solid var(--primary-green); color: var(--primary-green); border-radius: 6px; font-size: 0.72rem; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px; }
-        .gps-btn:active { background: var(--light-green); }
-        .gps-status-bar { background: var(--light-green); color: var(--primary-green); padding: 6px 8px; border-radius: 6px; font-size: 0.7rem; font-weight: bold; text-align: center; border: 1px solid #c8e6c9; margin-top: 6px; }
-        .venue-tabs { display: flex; gap: 6px; margin-bottom: 8px; border-bottom: 2px solid #e2e8f0; padding-bottom: 6px; }
-        .venue-tab-btn { flex: 1; padding: 8px 0; border: 1px solid #cbd5e0; background-color: #f8fafc; color: #4a5568; border-radius: 8px; font-size: 0.78rem; font-weight: bold; cursor: pointer; text-align: center; }
-        .venue-tab-btn.active { background-color: var(--primary-green); color: white; border-color: var(--primary-green); }
-        .floor-tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; margin-bottom: 8px; }
-        .floor-tab-btn { background-color: #f1f5f9; border: 1px solid #cbd5e0; color: #4a5568; padding: 7px 0; border-radius: 6px; font-size: 0.72rem; font-weight: bold; cursor: pointer; text-align: center; }
-        .floor-tab-btn.active { background-color: var(--accent-green); color: white; border-color: var(--accent-green); }
-        .floor-map-display { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px; display: flex; flex-direction: column; align-items: center; }
-        .floor-img-box { width: 100%; aspect-ratio: 1 / 1; max-height: 200px; border-radius: 6px; background-color: #ffffff; margin-bottom: 8px; display: flex; justify-content: center; align-items: center; position: relative; border: 1px solid #edf2f7; overflow: hidden; cursor: pointer; }
-        .floor-svg, .floor-real-img { width: 100%; height: 100%; display: block; object-fit: contain; }
-        .zoom-hint { position: absolute; bottom: 6px; right: 6px; background: rgba(0,0,0,0.65); color: white; font-size: 0.6rem; padding: 3px 6px; border-radius: 4px; pointer-events: none; }
-        .floor-info-desc { width: 100%; text-align: left; }
-        .floor-map-title { font-weight: bold; color: var(--primary-green); font-size: 0.78rem; margin-bottom: 3px; }
-        .floor-map-desc { font-size: 0.72rem; color: #4a5568; line-height: 1.35; }
-        .evac-box { background-color: #fdf2f2; border: 1px solid #f5c6cb; border-radius: 8px; padding: 8px 10px; font-size: 0.72rem; color: #721c24; line-height: 1.4; }
-        .ev-refresh-btn { background: white; border: 1px solid #cbd5e0; border-radius: 4px; padding: 3px 8px; font-size: 0.68rem; color: #4a5568; cursor: pointer; display: flex; align-items: center; gap: 4px; font-weight: bold; }
+        :root {
+            --primary-green: #1b4d3e;
+            --accent-green: #2e8b57;
+            --light-green: #e8f5e9;
+            --bg-color: #f4f7f5;
+            --text-color: #2c3e50;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* 모바일 전체 화면 대응 레이아웃 재정의 */
+        html, body {
+            width: 100%;
+            height: 100%;
+            height: 100dvh;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .phone-container {
+            width: 100%;
+            height: 100%;
+            height: 100dvh;
+            max-width: 480px;
+            background-color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+
+        @media (min-width: 481px) {
+            .phone-container {
+                height: calc(100vh - 40px);
+                max-height: 840px;
+                border-radius: 35px;
+                border: 12px solid #14382d;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            }
+        }
+
+        header {
+            background-color: var(--primary-green);
+            color: white;
+            padding: 10px 16px;
+            text-align: center;
+            flex-shrink: 0;
+            z-index: 5;
+        }
+
+        header h1 {
+            font-size: 1rem;
+            margin-bottom: 1px;
+        }
+
+        header p {
+            font-size: 0.68rem;
+            opacity: 0.85;
+        }
+
+        /* 스크롤 가능한 본문 영역 (하단 바에 가려지지 않도록 패딩 확보) */
+        .content {
+            flex: 1;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            padding: 12px 12px 80px 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            background-color: var(--bg-color);
+        }
+
+        .section-title {
+            font-size: 0.82rem;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: var(--primary-green);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .map-section, .floor-section, .info-card {
+            background-color: white;
+            border-radius: 12px;
+            padding: 10px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+            flex-shrink: 0;
+        }
+
+        /* 구글맵 조작 영역 */
+        .google-map-box {
+            width: 100%;
+            height: 190px;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #cbd5e0;
+            position: relative;
+            background: #e5e3df;
+        }
+
+        .google-map-box iframe {
+            width: 100%;
+            height: 100%;
+            border: 0;
+            pointer-events: auto !important;
+            touch-action: auto !important;
+        }
+
+        .map-tools {
+            display: flex;
+            gap: 6px;
+            margin-top: 8px;
+        }
+
+        .gps-btn {
+            flex: 1;
+            padding: 8px;
+            background: #ffffff;
+            border: 1px solid var(--primary-green);
+            color: var(--primary-green);
+            border-radius: 6px;
+            font-size: 0.72rem;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+        }
+
+        .gps-btn:active {
+            background: var(--light-green);
+        }
+
+        .gps-status-bar {
+            background: var(--light-green);
+            color: var(--primary-green);
+            padding: 6px 8px;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            text-align: center;
+            border: 1px solid #c8e6c9;
+            margin-top: 6px;
+        }
+
+        /* 층별 선택 탭 */
+        .venue-tabs {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 8px;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 6px;
+        }
+
+        .venue-tab-btn {
+            flex: 1;
+            padding: 8px 0;
+            border: 1px solid #cbd5e0;
+            background-color: #f8fafc;
+            color: #4a5568;
+            border-radius: 8px;
+            font-size: 0.78rem;
+            font-weight: bold;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .venue-tab-btn.active {
+            background-color: var(--primary-green);
+            color: white;
+            border-color: var(--primary-green);
+        }
+
+        .floor-tabs {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 4px;
+            margin-bottom: 8px;
+        }
+
+        .floor-tab-btn {
+            background-color: #f1f5f9;
+            border: 1px solid #cbd5e0;
+            color: #4a5568;
+            padding: 7px 0;
+            border-radius: 6px;
+            font-size: 0.72rem;
+            font-weight: bold;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .floor-tab-btn.active {
+            background-color: var(--accent-green);
+            color: white;
+            border-color: var(--accent-green);
+        }
+
+        .floor-map-display {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .floor-img-box {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            max-height: 200px;
+            border-radius: 6px;
+            background-color: #ffffff;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            border: 1px solid #edf2f7;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .floor-svg, .floor-real-img {
+            width: 100%;
+            height: 100%;
+            display: block;
+            object-fit: contain;
+        }
+
+        .zoom-hint {
+            position: absolute;
+            bottom: 6px;
+            right: 6px;
+            background: rgba(0,0,0,0.65);
+            color: white;
+            font-size: 0.6rem;
+            padding: 3px 6px;
+            border-radius: 4px;
+            pointer-events: none;
+        }
+
+        .floor-info-desc {
+            width: 100%;
+            text-align: left;
+        }
+
+        .floor-map-title {
+            font-weight: bold;
+            color: var(--primary-green);
+            font-size: 0.78rem;
+            margin-bottom: 3px;
+        }
+
+        .floor-map-desc {
+            font-size: 0.72rem;
+            color: #4a5568;
+            line-height: 1.35;
+        }
+
+        .evac-box {
+            background-color: #fdf2f2;
+            border: 1px solid #f5c6cb;
+            border-radius: 8px;
+            padding: 8px 10px;
+            font-size: 0.72rem;
+            color: #721c24;
+            line-height: 1.4;
+        }
+
+        /* 전기차 실시간 현황 영역 (P1, P3, P5) */
+        .ev-refresh-btn {
+            background: white; border: 1px solid #cbd5e0; border-radius: 4px;
+            padding: 3px 8px; font-size: 0.68rem; color: #4a5568; cursor: pointer;
+            display: flex; align-items: center; gap: 4px; font-weight: bold;
+        }
         .ev-refresh-btn:active { background: #f1f5f9; }
-        .ev-grid { display: flex; flex-direction: column; gap: 6px; }
-        .ev-item { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px 10px; display: flex; justify-content: space-between; align-items: center; }
+        .ev-grid {
+            display: flex; flex-direction: column; gap: 6px;
+        }
+        .ev-item {
+            background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px;
+            padding: 8px 10px; display: flex; justify-content: space-between; align-items: center;
+        }
         .ev-zone-info { display: flex; flex-direction: column; gap: 2px; }
         .ev-zone { font-size: 0.75rem; font-weight: bold; color: #2d3748; }
         .ev-types { font-size: 0.62rem; color: #718096; }
@@ -48,10 +309,40 @@
         .ev-status .avail { font-size: 0.8rem; font-weight: bold; color: var(--accent-green); }
         .ev-status .full { font-size: 0.8rem; font-weight: bold; color: #e53e3e; }
         .ev-note { font-size: 0.62rem; color: #a0aec0; text-align: right; margin-top: 6px; }
-        .action-bar { position: absolute; bottom: 0; left: 0; width: 100%; display: flex; gap: 8px; padding: 10px 12px; padding-bottom: max(10px, env(safe-area-inset-bottom, 10px)); background-color: white; border-top: 1px solid #e2e8f0; z-index: 100; }
-        .action-btn { flex: 1; padding: 11px 10px; border-radius: 8px; border: none; font-size: 0.8rem; font-weight: bold; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 6px; }
+
+        /* 하단 고정 액션 바 */
+        .action-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            display: flex;
+            gap: 8px;
+            padding: 10px 12px;
+            padding-bottom: max(10px, env(safe-area-inset-bottom, 10px));
+            background-color: white;
+            border-top: 1px solid #e2e8f0;
+            z-index: 100;
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 11px 10px;
+            border-radius: 8px;
+            border: none;
+            font-size: 0.8rem;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+        }
+
         .btn-call { background-color: #f1f8f6; color: var(--primary-green); border: 1px solid #c8e6c9; }
         .btn-chat { background-color: var(--accent-green); color: white; }
+
+        /* 모달 팝업 및 오버레이 */
         .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 200; }
         .overlay.active { display: flex; }
         .call-modal { background: white; width: 88%; max-height: 80vh; border-radius: 16px; padding: 16px; text-align: center; display: flex; flex-direction: column; }
@@ -60,6 +351,7 @@
         .call-option-btn { display: block; width: 100%; padding: 9px 10px; margin-bottom: 6px; background: #f8fafc; border: 1px solid #cbd5e0; border-radius: 8px; color: #2d3748; text-decoration: none; font-size: 0.75rem; font-weight: bold; text-align: left; }
         .call-option-btn span { display: block; font-size: 0.62rem; color: #718096; font-weight: normal; margin-top: 2px; }
         .call-close-btn { width: 100%; padding: 8px; background: #edf2f7; border: none; border-radius: 6px; font-size: 0.72rem; font-weight: bold; color: #4a5568; cursor: pointer; }
+
         .img-modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.92); display: none; flex-direction: column; z-index: 300; overflow: hidden; }
         .img-modal-overlay.active { display: flex; }
         .img-modal-header { padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; color: white; font-size: 0.8rem; font-weight: bold; z-index: 302; background: rgba(0,0,0,0.4); }
@@ -70,59 +362,74 @@
         .zoom-controls { position: absolute; bottom: 35px; left: 50%; transform: translateX(-50%); display: flex; gap: 10px; z-index: 302; background: rgba(0,0,0,0.6); padding: 6px 12px; border-radius: 20px; }
         .zoom-btn { background: white; color: #2d3748; border: none; width: 30px; height: 30px; border-radius: 50%; font-weight: bold; font-size: 0.95rem; cursor: pointer; }
         .zoom-reset-btn { background: #cbd5e0; color: #2d3748; border: none; padding: 0 10px; height: 30px; border-radius: 15px; font-size: 0.68rem; font-weight: bold; cursor: pointer; }
-        
-        /* AI 챗봇 모달 스타일 확장 */
-        .chat-modal { position: fixed; bottom: 0; left: 0; width: 100%; height: 90%; background-color: white; border-top-left-radius: 20px; border-top-right-radius: 20px; box-shadow: 0 -5px 20px rgba(0,0,0,0.15); display: flex; flex-direction: column; transform: translateY(100%); transition: transform 0.3s ease-in-out; z-index: 250; padding-bottom: env(safe-area-inset-bottom, 0px); }
+
+        .chat-modal { position: fixed; bottom: 0; left: 0; width: 100%; height: 85%; background-color: white; border-top-left-radius: 20px; border-top-right-radius: 20px; box-shadow: 0 -5px 20px rgba(0,0,0,0.15); display: flex; flex-direction: column; transform: translateY(100%); transition: transform 0.3s ease-in-out; z-index: 250; padding-bottom: env(safe-area-inset-bottom, 0px); }
         .chat-modal.active { transform: translateY(0); }
-        .chat-header { padding: 12px 16px; background-color: var(--primary-green); color: white; border-top-left-radius: 20px; border-top-right-radius: 20px; display: flex; justify-content: space-between; align-items: center; font-weight: bold; font-size: 0.85rem; }
+        .chat-header { padding: 12px 16px; background-color: var(--primary-green); color: white; border-top-left-radius: 20px; border-top-right-radius: 20px; display: flex; justify-content: space-between; align-items: center; font-weight: bold; font-size: 0.8rem; }
         .close-chat { background: none; border: none; color: white; font-size: 1.2rem; cursor: pointer; }
-        .chat-body { flex: 1; padding: 12px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; background-color: #f9fbf9; }
-        .chat-message { max-width: 90%; padding: 10px 14px; border-radius: 12px; font-size: 0.78rem; line-height: 1.5; word-break: break-all; }
-        .chat-message.bot { background-color: white; align-self: flex-start; border: 1px solid #e2e8f0; color: #2d3748; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .chat-body { flex: 1; padding: 12px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; background-color: #f9fbf9; }
+        .chat-message { max-width: 88%; padding: 9px 12px; border-radius: 12px; font-size: 0.75rem; line-height: 1.45; word-break: break-all; }
+        .chat-message.bot { background-color: white; align-self: flex-start; border: 1px solid #e2e8f0; color: #2d3748; }
         .chat-message.user { background-color: var(--accent-green); color: white; align-self: flex-end; }
-        .chat-message ul { margin-left: 16px; margin-top: 6px; margin-bottom: 6px; }
-        .chat-message li { margin-bottom: 4px; }
-        .quick-chips { display: flex; gap: 6px; padding: 10px; overflow-x: auto; background: #fff; border-top: 1px solid #edf2f7; -webkit-overflow-scrolling: touch; }
+        
+        /* 챗봇 빠른 질문 칩 영역 확장 디자인 */
+        .quick-chips { display: flex; gap: 6px; padding: 8px 10px; overflow-x: auto; background: #fff; border-top: 1px solid #edf2f7; -webkit-overflow-scrolling: touch; }
         .quick-chips::-webkit-scrollbar { display: none; }
-        .chip { background: var(--light-green); color: var(--primary-green); border: 1px solid #c8e6c9; padding: 6px 10px; border-radius: 16px; font-size: 0.7rem; white-space: nowrap; cursor: pointer; font-weight: bold; flex-shrink: 0; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
-        .chat-footer { padding: 10px 12px; display: flex; gap: 8px; border-top: 1px solid #e2e8f0; background-color: white; }
-        .chat-footer input { flex: 1; padding: 10px 12px; border: 1px solid #cbd5e0; border-radius: 8px; outline: none; font-size: 0.8rem; }
-        .chat-footer button { padding: 10px 16px; background-color: var(--accent-green); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 0.8rem; }
+        .chip { background: var(--light-green); color: var(--primary-green); border: 1px solid #c8e6c9; padding: 5px 9px; border-radius: 14px; font-size: 0.65rem; white-space: nowrap; cursor: pointer; font-weight: bold; flex-shrink: 0; }
+        
+        .chat-footer { padding: 8px 12px; display: flex; gap: 6px; border-top: 1px solid #e2e8f0; background-color: white; }
+        .chat-footer input { flex: 1; padding: 8px 10px; border: 1px solid #cbd5e0; border-radius: 8px; outline: none; font-size: 0.75rem; }
+        .chat-footer button { padding: 8px 12px; background-color: var(--accent-green); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 0.75rem; }
     </style>
 </head>
 <body>
 
     <div class="phone-container">
-        <!-- 기존 헤더, 본문(content) 등 HTML 구조 유지 -->
         <header>
             <h1>🏟️ 화성종합경기타운</h1>
             <p>스마트 통합 정보 안내</p>
         </header>
 
         <div class="content">
-            <!-- 지도 영역 -->
+
+            <!-- 1. 지도 영역 -->
             <div class="map-section">
                 <div class="section-title">
                     <span>🗺️ 실시간 위치 및 지도</span>
+                    <span style="font-size: 0.6rem; background: var(--light-green); color: var(--primary-green); padding: 2px 6px; border-radius: 4px; font-weight: bold;">💡 확대/축소 가능</span>
                 </div>
                 <div class="google-map-box">
-                    <iframe id="mapIframe" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3171.86241072978!2d126.9221251!3d37.1375!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x357b447a11ebc5a1%3A0x6b6d51187c3e538!2z7ZmU7ISx7Kii7ZWp6rK96riw7YOA7IanaQ!5e0!3m2!1sko!2skr!4v1700000000000!5m2!1sko!2skr&gestureHandling=greedy" allowfullscreen="" loading="eager"></iframe>
+                    <iframe 
+                        id="mapIframe"
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3171.86241072978!2d126.9221251!3d37.1375!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x357b447a11ebc5a1%3A0x6b6d51187c3e538!2z7ZmU7ISx7Kii7ZWp6rK96riw7YOA7IanaQ!5e0!3m2!1sko!2skr!4v1700000000000!5m2!1sko!2skr&gestureHandling=greedy" 
+                        allowfullscreen="" 
+                        loading="eager"
+                        referrerpolicy="no-referrer-when-downgrade"
+                        title="지도">
+                    </iframe>
                 </div>
+                
                 <div class="map-tools">
-                    <button class="gps-btn" onclick="getUserLocation()">🎯 내 위치 확인</button>
-                    <button class="gps-btn" onclick="resetMapToStadium()">🏟️ 경기타운 이동</button>
+                    <button class="gps-btn" onclick="getUserLocation()">🎯 내 위치로 지도 변경</button>
+                    <button class="gps-btn" onclick="resetMapToStadium()">🏟️ 경기타운 위치로 이동</button>
                 </div>
-                <div class="gps-status-bar" id="gpsStatus">📍 위치 정보: 화성종합경기타운</div>
+
+                <div class="gps-status-bar" id="gpsStatus">
+                    📍 위치 정보: 화성종합경기타운 (경기장 기본 위치)
+                </div>
             </div>
 
-            <!-- 평면도 영역 -->
+            <!-- 2. 경기장 층별 평면도 -->
             <div class="floor-section">
                 <div class="section-title">🏢 경기장 층별 평면도 및 시설 배치</div>
+                
                 <div class="venue-tabs">
                     <button class="venue-tab-btn active" id="venueMainBtn" onclick="switchVenue('main')">🏟️ 주경기장</button>
                     <button class="venue-tab-btn" id="venueIndoorBtn" onclick="switchVenue('indoor')">🏀 실내체육관</button>
                 </div>
+
                 <div class="floor-tabs" id="floorTabContainer"></div>
+                
                 <div class="floor-map-display">
                     <div class="floor-img-box" onclick="openImageModal()">
                         <div id="svgContainer" style="width:100%; height:100%; display:flex; justify-content:center; align-items:center;"></div>
@@ -132,7 +439,7 @@
                 </div>
             </div>
 
-            <!-- 비상대피로 안내 -->
+            <!-- 3. 비상대피로 안내 -->
             <div class="info-card">
                 <div class="section-title">🚨 비상대피로 안내</div>
                 <div class="evac-box">
@@ -141,19 +448,23 @@
                 </div>
             </div>
 
-            <!-- 전기차 현황 -->
+            <!-- 4. 실시간 전기차 충전소 현황 (P1, P3, P5 연동 프레임) -->
             <div class="info-card">
                 <div class="section-title">
-                    <span>⚡ 실시간 전기차 충전소</span>
+                    <span>⚡ 실시간 전기차 충전소 (P1·P3·P5)</span>
                     <button class="ev-refresh-btn" onclick="fetchEVChargingData()">🔄 새로고침</button>
                 </div>
-                <div class="ev-grid" id="evGridContainer"></div>
-                <div class="ev-note" id="evUpdateNote">무공해차 통합누리집 API 연동 중</div>
+                <div class="ev-grid" id="evGridContainer">
+                    <!-- JS로 P1, P3, P5 목록이 렌더링됩니다 -->
+                </div>
+                <div class="ev-note" id="evUpdateNote">무공해차 통합누리집 API 연동 대기중 (데모 모드)</div>
             </div>
+
         </div>
 
+        <!-- 하단 고정 액션 바 -->
         <div class="action-bar">
-            <button class="action-btn btn-call" onclick="toggleCallModal()">📞 주요전화</button>
+            <button class="action-btn btn-call" onclick="toggleCallModal()">📞 전화 문의</button>
             <button class="action-btn btn-chat" onclick="toggleChat()">💬 AI 챗봇 상담</button>
         </div>
 
@@ -162,19 +473,26 @@
             <div class="call-modal">
                 <h3>📞 주요 기관 전화번호</h3>
                 <div class="call-list">
-                    <a href="tel:1577-4200" class="call-option-btn">🏛️ 만세구청(임시) 대표전화<span>1577-4200</span></a>
+                    <a href="tel:1577-4200" class="call-option-btn">🏛️ 만세구청 대표전화<span>1577-4200</span></a>
                     <a href="tel:1577-1488" class="call-option-btn">🏢 화성도시공사 대표전화<span>1577-1488</span></a>
-                    <a href="tel:031-371-0011" class="call-option-btn">🏟️ 경기타운 관리(대관)<span>031-371-0011</span></a>
+                    <a href="tel:031-371-0011" class="call-option-btn">🏟️ 경기타운 관리사무실<span>031-371-0011</span></a>
+                    <a href="tel:031-355-3500" class="call-option-btn">🏆 화성시체육회<span>031-355-3500</span></a>
+                    <a href="tel:031-8059-0676" class="call-option-btn">♿ 화성시장애인체육회<span>031-8059-0676</span></a>
                     <a href="tel:031-366-4081" class="call-option-btn">⚽ 화성FC 사무국<span>031-366-4081</span></a>
                 </div>
                 <button class="call-close-btn" onclick="toggleCallModal()">닫기</button>
             </div>
         </div>
 
-        <!-- 이미지 확대 모달 (기존 동일) -->
+        <!-- 평면도 확대 모달 -->
         <div class="img-modal-overlay" id="imgModalOverlay">
-            <div class="img-modal-header"><span id="imgModalTitle">층별 안내도 확대</span><button class="img-modal-close" onclick="closeImageModal()">✕</button></div>
-            <div class="img-modal-body" id="modalTouchArea"><div id="modalZoomWrapper"></div></div>
+            <div class="img-modal-header">
+                <span id="imgModalTitle">층별 안내도 확대</span>
+                <button class="img-modal-close" onclick="closeImageModal()">✕</button>
+            </div>
+            <div class="img-modal-body" id="modalTouchArea">
+                <div id="modalZoomWrapper"></div>
+            </div>
             <div class="zoom-controls">
                 <button class="zoom-btn" onclick="adjustZoom(0.5)">+</button>
                 <button class="zoom-btn" onclick="adjustZoom(-0.5)">-</button>
@@ -182,58 +500,228 @@
             </div>
         </div>
 
-        <!-- AI 챗봇 모달 (칩 및 콘텐츠 대폭 강화) -->
+        <!-- AI 챗봇 모달 (화성도시공사/나무위키/시청 정보 반영) -->
         <div class="chat-modal" id="chatModal">
             <div class="chat-header">
                 <span>🤖 화성종합경기타운 AI 스마트 안내</span>
                 <button class="close-chat" onclick="toggleChat()">✕</button>
             </div>
             <div class="chat-body" id="chatBody">
-                <div class="chat-message bot">안녕하세요! 화성종합경기타운에 대한 모든 것을 알려드립니다.<br><br><b>화성시청, 화성도시공사</b> 등의 공식/백과 데이터를 기반으로 시설 규모부터 입주 기관, 홈구단 정보까지 상세히 답변해 드립니다! 무엇이 궁금하신가요?</div>
+                <div class="chat-message bot">안녕하세요! 화성종합경기타운 통합 안내 AI 도우미입니다. 시설, 주차, 입주 기관, 교통 등에 대해 무엇이든 물어보세요!</div>
             </div>
             <div class="quick-chips">
-                <div class="chip" onclick="sendQuickMessage('주차장 요금')">🚗 주차장/요금</div>
-                <div class="chip" onclick="sendQuickMessage('구청 및 입주기관')">🏢 입주기관/만세구청</div>
-                <div class="chip" onclick="sendQuickMessage('배구 경기')">🏐 IBK배구/실내체육관</div>
-                <div class="chip" onclick="sendQuickMessage('축구 경기')">⚽ 화성FC/주경기장</div>
-                <div class="chip" onclick="sendQuickMessage('오시는 길')">🚇 교통/향남역</div>
-                <div class="chip" onclick="sendQuickMessage('시설 규모')">🏟️ 전체 시설 규모</div>
+                <div class="chip" onclick="sendQuickMessage('주차 정보')">🚗 주차 안내</div>
+                <div class="chip" onclick="sendQuickMessage('전기차 충전')">⚡ 전기차 충전</div>
+                <div class="chip" onclick="sendQuickMessage('입주 기관')">🏢 입주 기관/구청</div>
+                <div class="chip" onclick="sendQuickMessage('오시는 길')">🚌 대중교통/위치</div>
+                <div class="chip" onclick="sendQuickMessage('화성FC')">⚽ 화성FC 홈구장</div>
+                <div class="chip" onclick="sendQuickMessage('시설 대관')">📋 대관 안내</div>
             </div>
             <div class="chat-footer">
-                <input type="text" id="userInput" placeholder="질문을 입력하세요... (예: 주차비 얼마야?)" onkeypress="if(event.key === 'Enter') sendMessage()">
+                <input type="text" id="userInput" placeholder="질문을 입력하세요..." onkeypress="if(event.key === 'Enter') sendMessage()">
                 <button onclick="sendMessage()">전송</button>
             </div>
         </div>
     </div>
 
     <script>
-        // --- 1. 기본 UI 제어 및 지도 스크립트 (기존 동일) ---
-        const stadiumLat = 37.1375, stadiumLng = 126.9221251;
-        document.addEventListener('DOMContentLoaded', () => { switchVenue('main'); autoCheckLocation(); fetchEVChargingData(); });
-        function autoCheckLocation() { if (navigator.geolocation) { navigator.geolocation.getCurrentPosition(p => updateMapLocation(p.coords.latitude, p.coords.longitude, "🎯 현재 내 위치"), e => {}, { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }); } }
-        function getUserLocation() { const gpsStatus = document.getElementById('gpsStatus'); gpsStatus.innerText = "⏳ 위치 확인 중..."; if (navigator.geolocation) { navigator.geolocation.getCurrentPosition(p => updateMapLocation(p.coords.latitude, p.coords.longitude, `🎯 내 위치 인식 완료`), e => gpsStatus.innerText = "⚠️ 위치 권한 필요", { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }); } }
-        function updateMapLocation(lat, lng, text) { document.getElementById('mapIframe').src = `https://maps.google.com/maps?q=${lat},${lng}&z=16&output=embed&gestureHandling=greedy`; document.getElementById('gpsStatus').innerText = text; }
-        function resetMapToStadium() { updateMapLocation(stadiumLat, stadiumLng, "📍 화성종합경기타운 기본 위치"); }
+        const stadiumLat = 37.1375;
+        const stadiumLng = 126.9221251;
 
-        // --- 2. 층별 맵 제어 스크립트 ---
+        document.addEventListener('DOMContentLoaded', () => {
+            switchVenue('main');
+            autoCheckLocation();
+            fetchEVChargingData();
+        });
+
+        function autoCheckLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        updateMapLocation(position.coords.latitude, position.coords.longitude, "🎯 현재 내 위치 중심 지도");
+                    },
+                    (error) => { console.log("GPS 허용 안됨"); },
+                    { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
+                );
+            }
+        }
+
+        function getUserLocation() {
+            const gpsStatus = document.getElementById('gpsStatus');
+            gpsStatus.innerText = "⏳ 위치 정보를 가져오는 중입니다...";
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        updateMapLocation(position.coords.latitude, position.coords.longitude, `🎯 내 위치 인식 완료`);
+                    },
+                    (error) => { gpsStatus.innerText = "⚠️ 위치 권한을 허용해 주세요."; },
+                    { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+                );
+            }
+        }
+
+        function updateMapLocation(lat, lng, statusText) {
+            document.getElementById('mapIframe').src = `https://maps.google.com/maps?q=${lat},${lng}&z=16&output=embed&gestureHandling=greedy`;
+            document.getElementById('gpsStatus').innerText = statusText;
+        }
+
+        function resetMapToStadium() {
+            updateMapLocation(stadiumLat, stadiumLng, "📍 화성종합경기타운 (경기장 기본 위치)");
+        }
+
         let currentVenue = 'main', currentFloor = '1f';
-        const venueConfig = {
-            main: { name: "주경기장", floors: [{ id: '3f', name: '3층' }, { id: '2f', name: '2층' }, { id: '1f', name: '1층' }], descriptions: { '3f': { title: "🏟️ 주경기장 3층", desc: "VIP석, 중계실, 민방위교육장" }, '2f': { title: "🏟️ 주경기장 2층", desc: "관람석 게이트(35,270석), 매점" }, '1f': { title: "🏟️ 주경기장 1층", desc: "화성도시공사, 만세구청, 화성FC" } } },
-            indoor: { name: "실내체육관", floors: [{ id: '2f', name: '2층' }, { id: '1f', name: '1층' }], descriptions: { '2f': { title: "🏀 실내체육관 2층", desc: "일반 관람석(5,152석)" }, '1f': { title: "🏀 실내체육관 1층", desc: "플로어, 차량등록사업소" } } }
+
+        const stadiumImageData = {
+            main: { '3f': 'main_3f.jpg', '2f': 'main_2f.jpg', '1f': 'main_1f.jpg' },
+            indoor: { '2f': 'indoor_2f.jpg', '1f': 'indoor_1f.jpg' }
         };
-        function switchVenue(v) { currentVenue = v; document.getElementById('venueMainBtn').classList.toggle('active', v === 'main'); document.getElementById('venueIndoorBtn').classList.toggle('active', v === 'indoor'); currentFloor = '1f'; renderFloorTabs(); updateFloorDisplay(); }
-        function renderFloorTabs() { const c = document.getElementById('floorTabContainer'); c.innerHTML = ''; venueConfig[currentVenue].floors.forEach(f => { const b = document.createElement('button'); b.className = `floor-tab-btn ${f.id === currentFloor ? 'active' : ''}`; b.innerText = f.name; b.onclick = () => { currentFloor = f.id; document.querySelectorAll('.floor-tab-btn').forEach(btn => btn.classList.remove('active')); b.classList.add('active'); updateFloorDisplay(); }; c.appendChild(b); }); c.style.gridTemplateColumns = `repeat(${venueConfig[currentVenue].floors.length}, 1fr)`; }
-        function updateFloorDisplay() { const color = currentVenue === 'main' ? '#1b4d3e' : '#2e8b57'; const name = currentVenue === 'main' ? '주경기장' : '실내체육관'; document.getElementById('svgContainer').innerHTML = `<svg viewBox="0 0 500 500" width="100%" height="100%"><circle cx="250" cy="250" r="210" fill="none" stroke="${color}" stroke-width="3" stroke-dasharray="6,6"/><text x="250" y="250" font-size="22" font-weight="bold" fill="${color}" text-anchor="middle">${name} ${currentFloor.toUpperCase()}</text></svg>`; const desc = venueConfig[currentVenue].descriptions[currentFloor]; document.getElementById('floorInfoDesc').innerHTML = `<div class="floor-map-title">${desc.title}</div><div class="floor-map-desc">${desc.desc}</div>`; }
+
+        const venueConfig = {
+            main: {
+                name: "주경기장",
+                floors: [{ id: '3f', name: '3층' }, { id: '2f', name: '2층' }, { id: '1f', name: '1층' }],
+                descriptions: {
+                    '3f': { title: "🏟️ 주경기장 3층", desc: "• 주요 시설: VIP 참관석, 방송중계실, 민방위교육장/안전체험교실" },
+                    '2f': { title: "🏟️ 주경기장 2층", desc: "• 주요 시설: 관람석 출입 게이트(G1~G21, 총 35,270석), 매점" },
+                    '1f': { title: "🏟️ 주경기장 1층", desc: "• 주요 시설: 화성도시공사, 만세구청 부서, 화성FC 사무국, 체육회" }
+                }
+            },
+            indoor: {
+                name: "실내체육관",
+                floors: [{ id: '2f', name: '2층' }, { id: '1f', name: '1층' }],
+                descriptions: {
+                    '2f': { title: "🏀 실내체육관 2층", desc: "• 주요 시설: 일반 관람석 입구(총 5,152석), 방송실" },
+                    '1f': { title: "🏀 실내체육관 1층", desc: "• 주요 시설: 경기 플로어, 노노카페, 차량등록사업소, 농협" }
+                }
+            }
+        };
+
+        function switchVenue(venueKey) {
+            currentVenue = venueKey;
+            document.getElementById('venueMainBtn').classList.toggle('active', venueKey === 'main');
+            document.getElementById('venueIndoorBtn').classList.toggle('active', venueKey === 'indoor');
+            currentFloor = '1f';
+            renderFloorTabs();
+            updateFloorDisplay();
+        }
+
+        function renderFloorTabs() {
+            const container = document.getElementById('floorTabContainer');
+            container.innerHTML = '';
+            const floors = venueConfig[currentVenue].floors;
+            container.style.gridTemplateColumns = `repeat(${floors.length}, 1fr)`;
+            floors.forEach(f => {
+                const btn = document.createElement('button');
+                btn.className = `floor-tab-btn ${f.id === currentFloor ? 'active' : ''}`;
+                btn.innerText = f.name;
+                btn.onclick = () => switchFloor(f.id, btn);
+                container.appendChild(btn);
+            });
+        }
+
+        function switchFloor(floorId, element) {
+            currentFloor = floorId;
+            document.querySelectorAll('.floor-tab-btn').forEach(btn => btn.classList.remove('active'));
+            if(element) element.classList.add('active');
+            updateFloorDisplay();
+        }
+
+        function updateFloorDisplay() {
+            document.getElementById('svgContainer').innerHTML = getFloorContent(currentVenue, currentFloor);
+            const desc = venueConfig[currentVenue].descriptions[currentFloor];
+            document.getElementById('floorInfoDesc').innerHTML = `<div class="floor-map-title">${desc.title}</div><div class="floor-map-desc">${desc.desc}</div>`;
+        }
+
+        function getFloorContent(venue, floor) {
+            const img = stadiumImageData[venue]?.[floor];
+            if (img) return `<img src="${img}" alt="안내도" class="floor-real-img" onerror="this.onerror=null; this.parentElement.innerHTML=getFallbackSvg('${venue}', '${floor}');" />`;
+            return getFallbackSvg(venue, floor);
+        }
+
+        function getFallbackSvg(venue, floor) {
+            const venueName = venue === 'main' ? '주경기장' : '실내체육관';
+            const color = venue === 'main' ? '#1b4d3e' : '#2e8b57';
+            return `<svg class="floor-svg" viewBox="0 0 500 500" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+                <rect width="500" height="500" fill="#ffffff"/><circle cx="250" cy="250" r="210" fill="none" stroke="${color}" stroke-width="3" stroke-dasharray="6,6"/>
+                <text x="250" y="250" font-size="22" font-weight="bold" fill="${color}" text-anchor="middle">${venueName} ${floor.toUpperCase()}</text>
+            </svg>`;
+        }
+
         function toggleCallModal() { document.getElementById('callOverlay').classList.toggle('active'); }
         function toggleChat() { document.getElementById('chatModal').classList.toggle('active'); }
 
-        // --- 3. 전기차 시뮬레이션 ---
-        function fetchEVChargingData() { document.getElementById('evUpdateNote').innerText = "⏳ 갱신 중..."; setTimeout(() => { const data = [ { zoneName: 'P1 주차장', chargerTypes: '급속 / 완속', total: 4, available: Math.floor(Math.random() * 5) }, { zoneName: 'P3 주차장', chargerTypes: '급속', total: 2, available: Math.floor(Math.random() * 3) }, { zoneName: 'P5 주차장', chargerTypes: '완속', total: 4, available: Math.floor(Math.random() * 5) } ]; const c = document.getElementById('evGridContainer'); c.innerHTML = ''; data.forEach(i => { c.innerHTML += `<div class="ev-item"><div class="ev-zone-info"><span class="ev-zone">${i.zoneName}</span><span class="ev-types">${i.chargerTypes}</span></div><span class="ev-status"><span class="${i.available===0?'full':'avail'}">${i.available}</span> / ${i.total}대</span></div>`; }); document.getElementById('evUpdateNote').innerText = `🟢 갱신: ${new Date().toLocaleTimeString()}`; }, 500); }
+        function renderEVUI(dataList) {
+            const container = document.getElementById('evGridContainer');
+            container.innerHTML = '';
+            
+            dataList.forEach(item => {
+                const isFull = item.available === 0;
+                const statusClass = isFull ? 'full' : 'avail';
+                
+                const div = document.createElement('div');
+                div.className = 'ev-item';
+                div.innerHTML = `
+                    <div class="ev-zone-info">
+                        <span class="ev-zone">${item.zoneName}</span>
+                        <span class="ev-types">${item.chargerTypes}</span>
+                    </div>
+                    <span class="ev-status">
+                        <span class="${statusClass}">${item.available}</span> / ${item.total}대 이용가능
+                    </span>
+                `;
+                container.appendChild(div);
+            });
+        }
 
-        // --- 4. 줌 제어 (기존) ---
-        let scale = 1, translateX = 0, translateY = 0; function openImageModal() { document.getElementById('modalZoomWrapper').innerHTML = document.getElementById('svgContainer').innerHTML; document.getElementById('imgModalOverlay').classList.add('active'); resetZoom(); } function closeImageModal() { document.getElementById('imgModalOverlay').classList.remove('active'); } function updateTransform() { document.getElementById('modalZoomWrapper').style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`; } function resetZoom() { scale = 1; translateX = translateY = 0; updateTransform(); } function adjustZoom(d) { scale = Math.max(1, Math.min(scale + d, 4)); if(scale===1){translateX=0;translateY=0;} updateTransform(); }
+        async function fetchEVChargingData() {
+            const noteEl = document.getElementById('evUpdateNote');
+            noteEl.innerText = "⏳ 충전소 실시간 정보 동기화 중...";
 
-        // --- 5. AI 챗봇 로직 (지식 DB 대폭 강화) ---
+            try {
+                setTimeout(() => {
+                    const mockApiData = [
+                        { zoneName: 'P1 주차장', chargerTypes: '급속 / 완속', total: 4, available: Math.floor(Math.random() * 5) },
+                        { zoneName: 'P3 주차장', chargerTypes: '급속', total: 2, available: Math.floor(Math.random() * 3) },
+                        { zoneName: 'P5 주차장', chargerTypes: '완속', total: 4, available: Math.floor(Math.random() * 5) }
+                    ];
+                    renderEVUI(mockApiData);
+                    const nowStr = new Date().toLocaleTimeString();
+                    noteEl.innerText = `🟢 마지막 갱신: ${nowStr} (무공해차 통합누리집 API 규격 호환)`;
+                }, 500);
+            } catch (error) {
+                console.error("EV API Load Error:", error);
+                noteEl.innerText = "⚠️ 실시간 정보를 불러오지 못했습니다.";
+            }
+        }
+
+        let scale = 1, translateX = 0, translateY = 0, isDragging = false, startX = 0, startY = 0, initialPinchDist = 0, initialScale = 1;
+        const zoomWrapper = document.getElementById('modalZoomWrapper'), touchArea = document.getElementById('modalTouchArea');
+
+        function updateTransform() { zoomWrapper.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`; }
+        function resetZoom() { scale = 1; translateX = translateY = 0; updateTransform(); }
+        function adjustZoom(delta) { scale = Math.max(1, Math.min(scale + delta, 4)); if (scale === 1) translateX = translateY = 0; updateTransform(); }
+
+        function openImageModal() {
+            zoomWrapper.innerHTML = getFloorContent(currentVenue, currentFloor);
+            document.getElementById('imgModalOverlay').classList.add('active');
+            resetZoom();
+        }
+        function closeImageModal() { document.getElementById('imgModalOverlay').classList.remove('active'); }
+
+        touchArea.addEventListener('touchstart', e => {
+            if (e.touches.length === 1) { isDragging = true; startX = e.touches[0].clientX - translateX; startY = e.touches[0].clientY - translateY; } 
+            else if (e.touches.length === 2) { isDragging = false; initialPinchDist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY); initialScale = scale; }
+        });
+        touchArea.addEventListener('touchmove', e => {
+            e.preventDefault();
+            if (e.touches.length === 1 && isDragging && scale > 1) { translateX = e.touches[0].clientX - startX; translateY = e.touches[0].clientY - startY; updateTransform(); } 
+            else if (e.touches.length === 2 && initialPinchDist > 0) {
+                scale = Math.max(1, Math.min(initialScale * (Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY) / initialPinchDist), 4));
+                if (scale === 1) translateX = translateY = 0; updateTransform();
+            }
+        }, { passive: false });
+        touchArea.addEventListener('touchend', () => { isDragging = false; initialPinchDist = 0; });
+
         function sendQuickMessage(text) { document.getElementById('userInput').value = text; sendMessage(); }
         
         function sendMessage() {
@@ -242,74 +730,51 @@
             const query = input.value.trim();
             if (!query) return;
 
-            // 유저 메시지 출력
             chatBody.innerHTML += `<div class="chat-message user">${query}</div>`;
             input.value = '';
             chatBody.scrollTop = chatBody.scrollHeight;
 
-            // 답변 딜레이 시뮬레이션
             setTimeout(() => {
-                let responseText = "🤖 해당 내용에 대한 상세 문의는 하단 [주요전화] 버튼을 통해 화성도시공사(1577-1488)로 연락해주시면 정확한 안내를 받으실 수 있습니다.";
+                let responseText = "🤖 상세 문의는 하단 [전화 문의] 버튼을 이용해 주시면 정성껏 안내해 드리겠습니다.";
                 
-                if (query.includes("주차") || query.includes("요금") || query.includes("주차비")) {
-                    responseText = `🚗 <b>주차장 이용 안내</b><br><br>
-                                   화성종합경기타운 주차장은 <b>전면 무료</b>로 운영되고 있습니다.<br>
-                                   <ul>
-                                     <li><b>총 주차면수:</b> 1,783면</li>
-                                     <li><b>세부구성:</b> 일반, 장애인(108면), 대형버스(25면), 친환경(50면) 등</li>
-                                     <li><b>전기차 충전:</b> P1, P3, P5 구역 (총 41대 완속/급속 인프라 완비)</li>
-                                   </ul>`;
+                if (query.includes("주차")) {
+                    responseText = `🚗 <b>주차장 이용 안내</b><br><br>` +
+                                   `• 총 주차 대수: 1,783면 (장애인용 108면, 버스 25면, 전기차 41대, 친환경 50대 포함)<br>` +
+                                   `• 요금: <b>무료 운영</b><br>` +
+                                   `• 전기차 충전: P1, P3, P5 구역 내 급속/완속 충전기 구비 (메인 화면 실시간 현황 참고)`;
                 }
                 else if (query.includes("전기차") || query.includes("충전")) {
-                    responseText = `⚡ <b>전기차 충전소 위치 및 현황</b><br><br>
-                                   현재 P1, P3, P5 주차장 구역에 <b>총 41대의 전기차 충전기(급속/완속)</b>가 설치되어 있습니다. 스마트 안내 홈 화면의 '실시간 전기차 충전소' 영역에서 구역별 실시간 빈자리(가용 대수)를 확인하실 수 있습니다.`;
+                    responseText = `⚡ <b>전기차 충전소 위치 및 현황</b><br><br>` +
+                                   `• 위치: P1, P3, P5 주차장 구역<br>` +
+                                   `• 구성: 급속 및 완속 충전기 총 41대 인프라 구축<br>` +
+                                   `• 안내: 본 화면 중간의 '실시간 전기차 충전소' 영역에서 구역별 실시간 가용 대수를 곧바로 확인하실 수 있습니다!`;
                 }
-                else if (query.includes("구청") || query.includes("입주") || query.includes("기관") || query.includes("만세")) {
-                    responseText = `🏢 <b>주요 입주 기관 (화성시청/도시공사 등)</b><br><br>
-                                   경기타운 내 유휴 공간을 활용하여 다양한 공공행정 업무가 이루어지고 있습니다.
-                                   <ul>
-                                     <li><b>만세구청(임시청사):</b> 화성특례시 출범 및 일반구 신설에 따라 자치행정, 세무, 복지, 환경 등 주요 과가 입주해 있습니다.</li>
-                                     <li><b>화성도시공사(HU):</b> 시설운영부 및 경기타운부 (주경기장 1층)</li>
-                                     <li><b>화성시차량등록사업소:</b> 실내체육관 1층</li>
-                                     <li><b>기타:</b> 화성시체육회, 화성FC 사무국 등</li>
-                                   </ul>`;
+                else if (query.includes("입주") || query.includes("구청") || query.includes("기관")) {
+                    responseText = `🏢 <b>주요 입주 기관 및 행정 안내</b><br><br>` +
+                                   `• <b>만세구청 임시청사:</b> 주경기장 및 실내체육관 내 주요 과(자치행정, 민원토지, 세무, 복지, 환경 등) 입주<br>` +
+                                   `• <b>화성도시공사:</b> 경기타운부 및 시설운영부 (주경기장 1층 J3)<br>` +
+                                   `• <b>체육 관련:</b> 화성FC 사무국, 화성시체육회, 화성시장애인체육회 입주`;
                 }
-                else if (query.includes("배구") || query.includes("IBK") || query.includes("알토스")) {
-                    responseText = `🏐 <b>실내체육관 (IBK기업은행 알토스)</b><br><br>
-                                   실내체육관(5,152석)은 V-리그 여자부 <b>IBK기업은행 알토스 배구단</b>의 홈구장으로 사용되고 있습니다.<br>
-                                   <ul>
-                                     <li><b>위치:</b> 실내체육관 구역 (홈 화면 평면도 참고)</li>
-                                     <li><b>티켓/입장:</b> 경기 당일 실내체육관 2층 게이트를 통해 입장하며, 시즌 중에는 주변 주차장이 매우 혼잡하므로 대중교통 이용을 권장합니다.</li>
-                                   </ul>`;
+                else if (query.includes("오시는") || query.includes("교통") || query.includes("위치")) {
+                    responseText = `🚌 <b>위치 및 대중교통 안내</b><br><br>` +
+                                   `• <b>주소:</b> 경기도 화성시 만세구 향남읍 향남로 470<br>` +
+                                   `• <b>서울 방면:</b> 사당역 등에서 8155, 8156번 광역버스 이용 편리<br>` +
+                                   `• <b>수원/오산 방면:</b> 수원역환승센터 및 오산역 방면 버스 노선 연계`;
                 }
-                else if (query.includes("축구") || query.includes("FC") || query.includes("주경기장")) {
-                    responseText = `⚽ <b>주경기장 (화성 FC 홈구장)</b><br><br>
-                                   주경기장은 천연잔디 구장과 몬도트랙을 갖춘 국제 규격 1종 육상경기장입니다.
-                                   <ul>
-                                     <li><b>좌석수:</b> 35,270석 (건축연면적 73,889㎡)</li>
-                                     <li><b>홈구단:</b> K리그에 참여하는 <b>화성 FC</b>의 홈구장으로 쓰이며, A매치 국가대표 경기 등 대형 스포츠 이벤트가 열립니다.</li>
-                                   </ul>`;
+                else if (query.includes("화성FC") || query.includes("축구")) {
+                    responseText = `⚽ <b>화성 FC 홈구장 안내</b><br><br>` +
+                                   `• <b>소속:</b> K리그2 프로축구단 화성 FC<br>` +
+                                   `• <b>구장 특징:</b> 천연잔디 필드와 몬도트랙을 갖춘 35,270석 규모의 주경기장 사용`;
                 }
-                else if (query.includes("오시는") || query.includes("교통") || query.includes("역") || query.includes("향남")) {
-                    responseText = `🚇 <b>위치 및 교통 안내 (서해선 포함)</b><br><br>
-                                   • <b>주소:</b> 경기도 화성시 향남읍 향남로 470<br>
-                                   • <b>지하철/철도:</b> 서해선 <b>향남역</b> 개통으로 철도 접근성이 매우 좋아졌습니다. 역에서 택시/버스로 약 5~10분 소요됩니다.<br>
-                                   • <b>버스:</b> 사당역(8155, 8156번 광역버스), 수원역, 오산역 등에서 향남행 버스를 탑승하여 '화성종합경기타운' 정류장에서 하차하시면 됩니다.`;
-                }
-                else if (query.includes("규모") || query.includes("시설") || query.includes("면적")) {
-                    responseText = `🏟️ <b>경기타운 시설 전체 규모</b><br><br>
-                                   대지면적 285,422㎡(약 8.6만 평)에 달하는 매머드급 종합 체육시설입니다. (2011년 준공)
-                                   <ul>
-                                     <li><b>주경기장:</b> 35,270석 (천연잔디, 육상트랙)</li>
-                                     <li><b>실내체육관:</b> 5,152석 (농구, 배구 등)</li>
-                                     <li><b>보조경기장:</b> 2,002석 (인조잔디)</li>
-                                     <li><b>부대시설:</b> 실내연습장, 대규모 주차장, 수변공원 등</li>
-                                   </ul>`;
+                else if (query.includes("대관") || query.includes("시설")) {
+                    responseText = `📋 <b>시설 대관 안내</b><br><br>` +
+                                   `• <b>대상 시설:</b> 주경기장(천연잔디/트랙), 보조경기장, 실내체육관, 실내연습장<br>` +
+                                   `• <b>신청 방법:</b> 화성도시공사 통합예약 시스템 또는 사전 일정 협의 후 대관 신청서 제출 (문의: 경기타운부 031-371-0011)`;
                 }
                 
                 chatBody.innerHTML += `<div class="chat-message bot">${responseText}</div>`;
                 chatBody.scrollTop = chatBody.scrollHeight;
-            }, 400); // 0.4초 후 답변
+            }, 300);
         }
     </script>
 </body>
