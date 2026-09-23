@@ -310,7 +310,7 @@
         .ev-status .full { font-size: 0.8rem; font-weight: bold; color: #e53e3e; }
         .ev-note { font-size: 0.62rem; color: #a0aec0; text-align: right; margin-top: 6px; }
 
-        /* 하단 고정 액션 바 (절대 위치로 화면 가장 아래에 명확히 고정) */
+        /* 하단 고정 액션 바 */
         .action-bar {
             position: absolute;
             bottom: 0;
@@ -371,9 +371,12 @@
         .chat-message { max-width: 88%; padding: 9px 12px; border-radius: 12px; font-size: 0.75rem; line-height: 1.45; word-break: break-all; }
         .chat-message.bot { background-color: white; align-self: flex-start; border: 1px solid #e2e8f0; color: #2d3748; }
         .chat-message.user { background-color: var(--accent-green); color: white; align-self: flex-end; }
+        
+        /* 챗봇 빠른 질문 칩 영역 확장 디자인 */
         .quick-chips { display: flex; gap: 6px; padding: 8px 10px; overflow-x: auto; background: #fff; border-top: 1px solid #edf2f7; -webkit-overflow-scrolling: touch; }
         .quick-chips::-webkit-scrollbar { display: none; }
         .chip { background: var(--light-green); color: var(--primary-green); border: 1px solid #c8e6c9; padding: 5px 9px; border-radius: 14px; font-size: 0.65rem; white-space: nowrap; cursor: pointer; font-weight: bold; flex-shrink: 0; }
+        
         .chat-footer { padding: 8px 12px; display: flex; gap: 6px; border-top: 1px solid #e2e8f0; background-color: white; }
         .chat-footer input { flex: 1; padding: 8px 10px; border: 1px solid #cbd5e0; border-radius: 8px; outline: none; font-size: 0.75rem; }
         .chat-footer button { padding: 8px 12px; background-color: var(--accent-green); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 0.75rem; }
@@ -497,20 +500,22 @@
             </div>
         </div>
 
-        <!-- AI 챗봇 모달 -->
+        <!-- AI 챗봇 모달 (화성도시공사/나무위키/시청 정보 반영) -->
         <div class="chat-modal" id="chatModal">
             <div class="chat-header">
                 <span>🤖 화성종합경기타운 AI 스마트 안내</span>
                 <button class="close-chat" onclick="toggleChat()">✕</button>
             </div>
             <div class="chat-body" id="chatBody">
-                <div class="chat-message bot">안녕하세요! 화성도시공사 및 주요 정보 안내를 도와드리는 AI 도우미입니다. 질문해 보세요!</div>
+                <div class="chat-message bot">안녕하세요! 화성종합경기타운 통합 안내 AI 도우미입니다. 시설, 주차, 입주 기관, 교통 등에 대해 무엇이든 물어보세요!</div>
             </div>
             <div class="quick-chips">
-                <div class="chip" onclick="sendQuickMessage('주차 정보')">🚗 주차 안내/요금</div>
-                <div class="chip" onclick="sendQuickMessage('주요 시설')">🏟️ 경기장 시설 정보</div>
-                <div class="chip" onclick="sendQuickMessage('전기차 충전')">⚡ 전기차 충전소 위치</div>
-                <div class="chip" onclick="sendQuickMessage('오시는 길')">📍 위치 및 오시는 길</div>
+                <div class="chip" onclick="sendQuickMessage('주차 정보')">🚗 주차 안내</div>
+                <div class="chip" onclick="sendQuickMessage('전기차 충전')">⚡ 전기차 충전</div>
+                <div class="chip" onclick="sendQuickMessage('입주 기관')">🏢 입주 기관/구청</div>
+                <div class="chip" onclick="sendQuickMessage('오시는 길')">🚌 대중교통/위치</div>
+                <div class="chip" onclick="sendQuickMessage('화성FC')">⚽ 화성FC 홈구장</div>
+                <div class="chip" onclick="sendQuickMessage('시설 대관')">📋 대관 안내</div>
             </div>
             <div class="chat-footer">
                 <input type="text" id="userInput" placeholder="질문을 입력하세요..." onkeypress="if(event.key === 'Enter') sendMessage()">
@@ -576,17 +581,17 @@
                 name: "주경기장",
                 floors: [{ id: '3f', name: '3층' }, { id: '2f', name: '2층' }, { id: '1f', name: '1층' }],
                 descriptions: {
-                    '3f': { title: "🏟️ 주경기장 3층", desc: "• 주요 시설: VIP 참관석, 방송중계실, 기자회견실" },
-                    '2f': { title: "🏟️ 주경기장 2층", desc: "• 주요 시설: 관람석 출입 게이트(G1~G21), 매점" },
-                    '1f': { title: "🏟️ 주경기장 1층", desc: "• 주요 시설: 화성도시공사, 화성시체육회, 화성FC" }
+                    '3f': { title: "🏟️ 주경기장 3층", desc: "• 주요 시설: VIP 참관석, 방송중계실, 민방위교육장/안전체험교실" },
+                    '2f': { title: "🏟️ 주경기장 2층", desc: "• 주요 시설: 관람석 출입 게이트(G1~G21, 총 35,270석), 매점" },
+                    '1f': { title: "🏟️ 주경기장 1층", desc: "• 주요 시설: 화성도시공사, 만세구청 부서, 화성FC 사무국, 체육회" }
                 }
             },
             indoor: {
                 name: "실내체육관",
                 floors: [{ id: '2f', name: '2층' }, { id: '1f', name: '1층' }],
                 descriptions: {
-                    '2f': { title: "🏀 실내체육관 2층", desc: "• 주요 시설: 일반 관람석 입구, 방송실" },
-                    '1f': { title: "🏀 실내체육관 1층", desc: "• 주요 시설: 경기 플로어, 심판실, 선수 대기실" }
+                    '2f': { title: "🏀 실내체육관 2층", desc: "• 주요 시설: 일반 관람석 입구(총 5,152석), 방송실" },
+                    '1f': { title: "🏀 실내체육관 1층", desc: "• 주요 시설: 경기 플로어, 노노카페, 차량등록사업소, 농협" }
                 }
             }
         };
@@ -718,6 +723,7 @@
         touchArea.addEventListener('touchend', () => { isDragging = false; initialPinchDist = 0; });
 
         function sendQuickMessage(text) { document.getElementById('userInput').value = text; sendMessage(); }
+        
         function sendMessage() {
             const input = document.getElementById('userInput');
             const chatBody = document.getElementById('chatBody');
@@ -730,9 +736,41 @@
 
             setTimeout(() => {
                 let responseText = "🤖 상세 문의는 하단 [전화 문의] 버튼을 이용해 주시면 정성껏 안내해 드리겠습니다.";
-                if (query.includes("주차")) responseText = `🚗 <b>주차장 이용 안내</b><br><br>• 무료 운영<br>• 총 1,783대 수용`;
-                else if (query.includes("시설") || query.includes("규모")) responseText = `🏟️ <b>주요 시설 개요</b><br><br>• 주경기장: 35,270석<br>• 실내체육관: 5,152석`;
-                else if (query.includes("전기차") || query.includes("충전")) responseText = `⚡ <b>전기차 충전소 안내</b><br><br>• P1, P3, P5 주차장 내 완속/급속 충전기 구비<br>• 홈 화면 '실시간 전기차 충전소'에서 P1·P3·P5 구역별 가용 대수 확인 가능`;
+                
+                if (query.includes("주차")) {
+                    responseText = `🚗 <b>주차장 이용 안내</b><br><br>` +
+                                   `• 총 주차 대수: 1,783면 (장애인용 108면, 버스 25면, 전기차 41대, 친환경 50대 포함)<br>` +
+                                   `• 요금: <b>무료 운영</b><br>` +
+                                   `• 전기차 충전: P1, P3, P5 구역 내 급속/완속 충전기 구비 (메인 화면 실시간 현황 참고)`;
+                }
+                else if (query.includes("전기차") || query.includes("충전")) {
+                    responseText = `⚡ <b>전기차 충전소 위치 및 현황</b><br><br>` +
+                                   `• 위치: P1, P3, P5 주차장 구역<br>` +
+                                   `• 구성: 급속 및 완속 충전기 총 41대 인프라 구축<br>` +
+                                   `• 안내: 본 화면 중간의 '실시간 전기차 충전소' 영역에서 구역별 실시간 가용 대수를 곧바로 확인하실 수 있습니다!`;
+                }
+                else if (query.includes("입주") || query.includes("구청") || query.includes("기관")) {
+                    responseText = `🏢 <b>주요 입주 기관 및 행정 안내</b><br><br>` +
+                                   `• <b>만세구청 임시청사:</b> 주경기장 및 실내체육관 내 주요 과(자치행정, 민원토지, 세무, 복지, 환경 등) 입주<br>` +
+                                   `• <b>화성도시공사:</b> 경기타운부 및 시설운영부 (주경기장 1층 J3)<br>` +
+                                   `• <b>체육 관련:</b> 화성FC 사무국, 화성시체육회, 화성시장애인체육회 입주`;
+                }
+                else if (query.includes("오시는") || query.includes("교통") || query.includes("위치")) {
+                    responseText = `🚌 <b>위치 및 대중교통 안내</b><br><br>` +
+                                   `• <b>주소:</b> 경기도 화성시 만세구 향남읍 향남로 470<br>` +
+                                   `• <b>서울 방면:</b> 사당역 등에서 8155, 8156번 광역버스 이용 편리<br>` +
+                                   `• <b>수원/오산 방면:</b> 수원역환승센터 및 오산역 방면 버스 노선 연계`;
+                }
+                else if (query.includes("화성FC") || query.includes("축구")) {
+                    responseText = `⚽ <b>화성 FC 홈구장 안내</b><br><br>` +
+                                   `• <b>소속:</b> K리그2 프로축구단 화성 FC<br>` +
+                                   `• <b>구장 특징:</b> 천연잔디 필드와 몬도트랙을 갖춘 35,270석 규모의 주경기장 사용`;
+                }
+                else if (query.includes("대관") || query.includes("시설")) {
+                    responseText = `📋 <b>시설 대관 안내</b><br><br>` +
+                                   `• <b>대상 시설:</b> 주경기장(천연잔디/트랙), 보조경기장, 실내체육관, 실내연습장<br>` +
+                                   `• <b>신청 방법:</b> 화성도시공사 통합예약 시스템 또는 사전 일정 협의 후 대관 신청서 제출 (문의: 경기타운부 031-371-0011)`;
+                }
                 
                 chatBody.innerHTML += `<div class="chat-message bot">${responseText}</div>`;
                 chatBody.scrollTop = chatBody.scrollHeight;
