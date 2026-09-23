@@ -284,6 +284,26 @@
             line-height: 1.4;
         }
 
+        /* 전기차 실시간 현황 영역 */
+        .ev-refresh-btn {
+            background: white; border: 1px solid #cbd5e0; border-radius: 4px;
+            padding: 3px 8px; font-size: 0.7rem; color: #4a5568; cursor: pointer;
+            display: flex; align-items: center; gap: 4px; font-weight: bold;
+        }
+        .ev-refresh-btn:active { background: #f1f5f9; }
+        .ev-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 6px;
+        }
+        .ev-item {
+            background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px;
+            padding: 8px 10px; display: flex; justify-content: space-between; align-items: center;
+        }
+        .ev-zone { font-size: 0.75rem; font-weight: bold; color: #2d3748; }
+        .ev-status { font-size: 0.75rem; color: #718096; }
+        .ev-status .avail { font-size: 0.85rem; font-weight: bold; color: var(--accent-green); }
+        .ev-status .full { font-size: 0.85rem; font-weight: bold; color: #e53e3e; }
+        .ev-note { font-size: 0.65rem; color: #a0aec0; text-align: right; margin-top: 6px; }
+
         /* 하단 고정 액션 바 */
         .action-bar {
             display: flex;
@@ -444,6 +464,19 @@
                     • <b>대피 장소:</b> 비상시 외부 계단을 통해 <b>야외 주차장 및 넓은 광장</b>으로 대피하세요.
                 </div>
             </div>
+
+            <!-- 4. 실시간 전기차 충전소 현황 -->
+            <div class="info-card">
+                <div class="section-title">
+                    <span>⚡ 실시간 전기차 충전소</span>
+                    <button class="ev-refresh-btn" onclick="simulateEVRefresh()">🔄 새로고침</button>
+                </div>
+                <div class="ev-grid" id="evGridContainer">
+                    <!-- JS로 P1~P7 목록이 생성됩니다 -->
+                </div>
+                <div class="ev-note">* API 연동 전 데모 화면입니다.</div>
+            </div>
+
         </div>
 
         <!-- 하단 액션 바 -->
@@ -507,104 +540,75 @@
     </div>
 
     <script>
-        // --- 1. 스마트폰 GPS 사용자 위치 확인 및 지도 반영 스크립트 ---
+        // --- 1. 스마트폰 GPS 사용자 위치 확인 및 지도 반영 ---
         const stadiumLat = 37.1375;
         const stadiumLng = 126.9221251;
 
-        // 페이지 진입 시 자동으로 위치 파악 시도
         document.addEventListener('DOMContentLoaded', () => {
             switchVenue('main');
             autoCheckLocation();
+            renderEVStatus(); // 전기차 현황 초기 렌더링
         });
 
         function autoCheckLocation() {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
                     (position) => {
-                        const lat = position.coords.latitude;
-                        const lng = position.coords.longitude;
-                        updateMapLocation(lat, lng, "🎯 현재 내 위치 중심 지도");
+                        updateMapLocation(position.coords.latitude, position.coords.longitude, "🎯 현재 내 위치 중심 지도");
                     },
-                    (error) => {
-                        console.log("GPS 허용 안됨 또는 오류:", error.message);
-                    },
+                    (error) => { console.log("GPS 허용 안됨"); },
                     { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
                 );
             }
         }
 
-        // 수동 버튼 클릭 시 위치 정보 업데이트
         function getUserLocation() {
             const gpsStatus = document.getElementById('gpsStatus');
             gpsStatus.innerText = "⏳ 위치 정보를 가져오는 중입니다...";
-
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
                     (position) => {
-                        const lat = position.coords.latitude;
-                        const lng = position.coords.longitude;
-                        updateMapLocation(lat, lng, `🎯 내 위치 인식 완료 (위도: ${lat.toFixed(4)}, 경도: ${lng.toFixed(4)})`);
+                        updateMapLocation(position.coords.latitude, position.coords.longitude, `🎯 내 위치 인식 완료`);
                     },
-                    (error) => {
-                        let errMsg = "⚠️ 위치 파악에 실패했습니다.";
-                        if (error.code === 1) errMsg = "⚠️ 위치 권한을 허용해 주세요 (브라우저 설정)";
-                        gpsStatus.innerText = errMsg;
-                    },
+                    (error) => { gpsStatus.innerText = "⚠️ 위치 권한을 허용해 주세요."; },
                     { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
                 );
-            } else {
-                gpsStatus.innerText = "⚠️ 이 브라우저는 GPS 기능(Geolocation)을 지원하지 않습니다.";
             }
         }
 
-        // 구글지도 Iframe URL 좌표 변경
         function updateMapLocation(lat, lng, statusText) {
-            const mapIframe = document.getElementById('mapIframe');
-            const gpsStatus = document.getElementById('gpsStatus');
-            
-            mapIframe.src = `https://maps.google.com/maps?q=${lat},${lng}&z=16&output=embed&gestureHandling=greedy`;
-            gpsStatus.innerText = statusText;
+            document.getElementById('mapIframe').src = `https://maps.google.com/maps?q=${lat},${lng}&z=16&output=embed&gestureHandling=greedy`;
+            document.getElementById('gpsStatus').innerText = statusText;
         }
 
         function resetMapToStadium() {
-            updateMapLocation(stadiumLat, stadiumLng, "📍 경기도 화성시 향남읍 향남로 470 (화성종합경기타운)");
+            updateMapLocation(stadiumLat, stadiumLng, "📍 화성종합경기타운 (경기장 기본 위치)");
         }
 
-        // --- 2. 층별 안내도 및 UI 스크립트 ---
-        let currentVenue = 'main';
-        let currentFloor = '1f';
+        // --- 2. 층별 안내도 및 UI ---
+        let currentVenue = 'main', currentFloor = '1f';
 
-        // 영문 파일명으로 매핑 변경
         const stadiumImageData = {
-            main: { 
-                '3f': 'main_3f.jpg', 
-                '2f': 'main_2f.jpg', 
-                '1f': 'main_1f.jpg' 
-            },
-            indoor: { 
-                '2f': 'indoor_2f.jpg', 
-                '1f': 'indoor_1f.jpg' 
-            }
+            main: { '3f': 'main_3f.jpg', '2f': 'main_2f.jpg', '1f': 'main_1f.jpg' },
+            indoor: { '2f': 'indoor_2f.jpg', '1f': 'indoor_1f.jpg' }
         };
 
         const venueConfig = {
             main: {
                 name: "주경기장",
-                floors: [
-                    { id: '3f', name: '3층' }, { id: '2f', name: '2층' }, { id: '1f', name: '1층' }
-                ],
+                floors: [{ id: '3f', name: '3층' }, { id: '2f', name: '2층' }, { id: '1f', name: '1층' }],
                 descriptions: {
-                    '3f': { title: "🏟️ 주경기장 3층 (VIP 및 미디어석)", desc: "• 주요 시설: VIP 참관석, 방송중계실, 기자회견실" },
-                    '2f': { title: "🏟️ 주경기장 2층 (관람석 및 편의시설)", desc: "• 주요 시설: 관람석 출입 게이트(G1~G21), 매점, 의무실" },
-                    '1f': { title: "🏟️ 주경기장 1층 (행정/입주기관)", desc: "• 주요 시설: 화성도시공사, 화성시체육회, 화성FC" }
+                    '3f': { title: "🏟️ 주경기장 3층", desc: "• 주요 시설: VIP 참관석, 방송중계실, 기자회견실" },
+                    '2f': { title: "🏟️ 주경기장 2층", desc: "• 주요 시설: 관람석 출입 게이트(G1~G21), 매점" },
+                    '1f': { title: "🏟️ 주경기장 1층", desc: "• 주요 시설: 화성도시공사, 화성시체육회, 화성FC" }
                 }
             },
             indoor: {
                 name: "실내체육관",
-                floors: [ { id: '2f', name: '2층' }, { id: '1f', name: '1층' } ],
+                floors: [{ id: '2f', name: '2층' }, { id: '1f', name: '1층' }],
                 descriptions: {
-                    '2f': { title: "🏀 실내체육관 2층 (관람석)", desc: "• 주요 시설: 일반 관람석 입구, 방송실" },
-                    '1f': { title: "🏀 실내체육관 1층 (플로어)", desc: "• 주요 시설: 경기 플로어(농구/배구/배드민턴), 심판실, 선수 대기실" }
+                    '2f': { title: "🏀 실내체육관 2층", desc: "• 주요 시설: 일반 관람석 입구, 방송실" },
+                    '1f': { title: "🏀 실내체육관 1층", desc: "• 주요 시설: 경기 플로어, 심판실, 선수 대기실" }
                 }
             }
         };
@@ -623,7 +627,6 @@
             container.innerHTML = '';
             const floors = venueConfig[currentVenue].floors;
             container.style.gridTemplateColumns = `repeat(${floors.length}, 1fr)`;
-
             floors.forEach(f => {
                 const btn = document.createElement('button');
                 btn.className = `floor-tab-btn ${f.id === currentFloor ? 'active' : ''}`;
@@ -642,122 +645,113 @@
 
         function updateFloorDisplay() {
             document.getElementById('svgContainer').innerHTML = getFloorContent(currentVenue, currentFloor);
-            const descData = venueConfig[currentVenue].descriptions[currentFloor];
-            const infoDesc = document.getElementById('floorInfoDesc');
-            if (descData) {
-                infoDesc.innerHTML = `<div class="floor-map-title">${descData.title}</div><div class="floor-map-desc">${descData.desc}</div>`;
-            }
+            const desc = venueConfig[currentVenue].descriptions[currentFloor];
+            document.getElementById('floorInfoDesc').innerHTML = `<div class="floor-map-title">${desc.title}</div><div class="floor-map-desc">${desc.desc}</div>`;
         }
 
         function getFloorContent(venue, floor) {
-            const imgFileName = stadiumImageData[venue] ? stadiumImageData[venue][floor] : null;
-            if (imgFileName) {
-                return `<img src="${imgFileName}" alt="안내도" class="floor-real-img" onerror="this.onerror=null; this.parentElement.innerHTML=getFallbackSvg('${venue}', '${floor}');" />`;
-            }
+            const img = stadiumImageData[venue]?.[floor];
+            if (img) return `<img src="${img}" alt="안내도" class="floor-real-img" onerror="this.onerror=null; this.parentElement.innerHTML=getFallbackSvg('${venue}', '${floor}');" />`;
             return getFallbackSvg(venue, floor);
         }
 
         function getFallbackSvg(venue, floor) {
             const venueName = venue === 'main' ? '주경기장' : '실내체육관';
             const color = venue === 'main' ? '#1b4d3e' : '#2e8b57';
-            return `
-            <svg class="floor-svg" viewBox="0 0 500 500" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
-                <rect width="500" height="500" fill="#ffffff"/>
-                <circle cx="250" cy="250" r="210" fill="none" stroke="${color}" stroke-width="3" stroke-dasharray="6,6"/>
-                <rect x="130" y="120" width="240" height="260" rx="40" fill="#f8fafc" stroke="${color}" stroke-width="4"/>
-                <text x="250" y="235" font-size="22" font-weight="bold" fill="${color}" text-anchor="middle">${venueName} ${floor.toUpperCase()}</text>
-                <text x="250" y="265" font-size="12" fill="#718096" text-anchor="middle">도면 이미지 준비 중</text>
+            return `<svg class="floor-svg" viewBox="0 0 500 500" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+                <rect width="500" height="500" fill="#ffffff"/><circle cx="250" cy="250" r="210" fill="none" stroke="${color}" stroke-width="3" stroke-dasharray="6,6"/>
+                <text x="250" y="250" font-size="22" font-weight="bold" fill="${color}" text-anchor="middle">${venueName} ${floor.toUpperCase()}</text>
             </svg>`;
         }
 
         function toggleCallModal() { document.getElementById('callOverlay').classList.toggle('active'); }
         function toggleChat() { document.getElementById('chatModal').classList.toggle('active'); }
 
-        let scale = 1, translateX = 0, translateY = 0, isDragging = false, startX = 0, startY = 0, initialPinchDistance = 0, initialScale = 1;
-        const zoomWrapper = document.getElementById('modalZoomWrapper');
-        const touchArea = document.getElementById('modalTouchArea');
+        // --- 3. 실시간 전기차 충전소 데모 스크립트 ---
+        const evData = [
+            { zone: 'P1 주차장', total: 4 }, { zone: 'P2 주차장', total: 2 },
+            { zone: 'P3 주차장', total: 6 }, { zone: 'P4 주차장', total: 4 },
+            { zone: 'P5 주차장', total: 2 }, { zone: 'P6 주차장', total: 4 },
+            { zone: 'P7 주차장', total: 2 }
+        ];
+
+        function renderEVStatus() {
+            const container = document.getElementById('evGridContainer');
+            container.innerHTML = '';
+            
+            evData.forEach(item => {
+                // 데모용 랜덤 가용 대수 생성 (실제 API 연동 시 이 부분을 교체)
+                const available = Math.floor(Math.random() * (item.total + 1));
+                const isFull = available === 0;
+                const statusClass = isFull ? 'full' : 'avail';
+                
+                const div = document.createElement('div');
+                div.className = 'ev-item';
+                div.innerHTML = `
+                    <span class="ev-zone">${item.zone}</span>
+                    <span class="ev-status"><span class="${statusClass}">${available}</span> / ${item.total}대</span>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function simulateEVRefresh() {
+            const btn = document.querySelector('.ev-refresh-btn');
+            btn.innerHTML = '⏳ 갱신 중...';
+            setTimeout(() => {
+                renderEVStatus();
+                btn.innerHTML = '🔄 새로고침';
+            }, 600);
+        }
+
+        // --- 평면도 확대 모달 스크립트 ---
+        let scale = 1, translateX = 0, translateY = 0, isDragging = false, startX = 0, startY = 0, initialPinchDist = 0, initialScale = 1;
+        const zoomWrapper = document.getElementById('modalZoomWrapper'), touchArea = document.getElementById('modalTouchArea');
 
         function updateTransform() { zoomWrapper.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`; }
-        function resetZoom() { scale = 1; translateX = 0; translateY = 0; updateTransform(); }
-        function adjustZoom(delta) { scale = Math.max(1, Math.min(scale + delta, 4)); if (scale === 1) { translateX = 0; translateY = 0; } updateTransform(); }
+        function resetZoom() { scale = 1; translateX = translateY = 0; updateTransform(); }
+        function adjustZoom(delta) { scale = Math.max(1, Math.min(scale + delta, 4)); if (scale === 1) translateX = translateY = 0; updateTransform(); }
 
         function openImageModal() {
             zoomWrapper.innerHTML = getFloorContent(currentVenue, currentFloor);
-            document.getElementById('imgModalTitle').innerText = `${venueConfig[currentVenue].name} ${currentFloor.toUpperCase()} 상세 안내도`;
             document.getElementById('imgModalOverlay').classList.add('active');
             resetZoom();
         }
         function closeImageModal() { document.getElementById('imgModalOverlay').classList.remove('active'); }
 
-        touchArea.addEventListener('touchstart', (e) => {
-            if (e.touches.length === 1) {
-                isDragging = true;
-                startX = e.touches[0].clientX - translateX;
-                startY = e.touches[0].clientY - translateY;
-            } else if (e.touches.length === 2) {
-                isDragging = false;
-                initialPinchDistance = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
-                initialScale = scale;
-            }
+        touchArea.addEventListener('touchstart', e => {
+            if (e.touches.length === 1) { isDragging = true; startX = e.touches[0].clientX - translateX; startY = e.touches[0].clientY - translateY; } 
+            else if (e.touches.length === 2) { isDragging = false; initialPinchDist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY); initialScale = scale; }
         });
-
-        touchArea.addEventListener('touchmove', (e) => {
+        touchArea.addEventListener('touchmove', e => {
             e.preventDefault();
-            if (e.touches.length === 1 && isDragging && scale > 1) {
-                translateX = e.touches[0].clientX - startX;
-                translateY = e.touches[0].clientY - startY;
-                updateTransform();
-            } else if (e.touches.length === 2 && initialPinchDistance > 0) {
-                const currentDist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
-                scale = Math.max(1, Math.min(initialScale * (currentDist / initialPinchDistance), 4));
-                if (scale === 1) { translateX = 0; translateY = 0; }
-                updateTransform();
+            if (e.touches.length === 1 && isDragging && scale > 1) { translateX = e.touches[0].clientX - startX; translateY = e.touches[0].clientY - startY; updateTransform(); } 
+            else if (e.touches.length === 2 && initialPinchDist > 0) {
+                scale = Math.max(1, Math.min(initialScale * (Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY) / initialPinchDist), 4));
+                if (scale === 1) translateX = translateY = 0; updateTransform();
             }
         }, { passive: false });
+        touchArea.addEventListener('touchend', () => { isDragging = false; initialPinchDist = 0; });
 
-        touchArea.addEventListener('touchend', () => { isDragging = false; initialPinchDistance = 0; });
-
-        // --- 3. AI 챗봇 응답 강화 스크립트 ---
-        function sendQuickMessage(text) {
-            document.getElementById('userInput').value = text;
-            sendMessage();
-        }
-
+        // --- AI 챗봇 ---
+        function sendQuickMessage(text) { document.getElementById('userInput').value = text; sendMessage(); }
         function sendMessage() {
             const input = document.getElementById('userInput');
             const chatBody = document.getElementById('chatBody');
             const query = input.value.trim();
             if (!query) return;
 
-            const userMsg = document.createElement('div');
-            userMsg.className = 'chat-message user';
-            userMsg.innerText = query;
-            chatBody.appendChild(userMsg);
+            chatBody.innerHTML += `<div class="chat-message user">${query}</div>`;
             input.value = '';
             chatBody.scrollTop = chatBody.scrollHeight;
 
             setTimeout(() => {
-                const botMsg = document.createElement('div');
-                botMsg.className = 'chat-message bot';
+                let responseText = "🤖 상세 문의는 하단 [전화 문의] 버튼을 이용해 주시면 정성껏 안내해 드리겠습니다.";
+                if (query.includes("주차")) responseText = `🚗 <b>주차장 이용 안내</b><br><br>• 무료 운영<br>• 총 1,783대 수용`;
+                else if (query.includes("시설") || query.includes("규모")) responseText = `🏟️ <b>주요 시설 개요</b><br><br>• 주경기장: 35,270석<br>• 실내체육관: 5,152석`;
+                else if (query.includes("전기차") || query.includes("충전")) responseText = `⚡ <b>전기차 충전소 안내</b><br><br>• P1~P7 주차장 내 완속/급속 충전기 구비<br>• 홈 화면 '실시간 전기차 충전소' 탭에서 현황 확인 가능`;
                 
-                let responseText = "🤖 화성종합경기타운 AI 스마트 안내입니다.<br><br>상세 문의는 하단 [전화 문의] 버튼 또는 대표전화(1577-1488 / 031-371-0011)로 연락해 주시면 정성껏 안내해 드리겠습니다.";
-
-                if (query.includes("주차") || query.includes("요금")) {
-                    responseText = `🚗 <b>주차장 이용 안내</b><br><br>• <b>주차 요금:</b> 무료 운영<br>• <b>수용 대수:</b> 총 1,783대 (지상/지하)<br>• <b>특이사항:</b> 대형 행사 시 가변 주차 운영`;
-                } else if (query.includes("시설") || query.includes("경기장") || query.includes("규모")) {
-                    responseText = `🏟️ <b>주요 시설 개요</b><br><br>• <b>주경기장:</b> 35,270석 (축구장, 육상트랙)<br>• <b>실내체육관:</b> 5,152석 (농구, 배구, 배드민턴 등)<br>• <b>보조경기장:</b> 2,000석`;
-                } else if (query.includes("대관") || query.includes("예약") || query.includes("신청")) {
-                    responseText = `📋 <b>시설 대관 안내</b><br><br>• <b>신청 방법:</b> 화성도시공사 종합경기타운 홈페이지 온라인 접수<br>• <b>문의 전화:</b> 031-371-0011 (관리사무실)<br>• <b>사용 가능 시설:</b> 주경기장, 실내체육관, 보조경기장`;
-                } else if (query.includes("길") || query.includes("위치") || query.includes("버스") || query.includes("교통")) {
-                    responseText = `📍 <b>오시는 길 안내</b><br><br>• <b>주소:</b> 경기도 화성시 향남읍 향남로 470<br>• <b>대중교통:</b> 향남역/향남터미널 인근 시내버스 및 마을버스 연계 (화성종합경기타운 정류장 하차)`;
-                } else if (query.includes("시간") || query.includes("운영")) {
-                    responseText = `⏰ <b>운영 시간 안내</b><br><br>• <b>시설 운영:</b> 06:00 ~ 22:00 (행사 및 대관에 따라 변동 가능)<br>• <b>관리사무실:</b> 09:00 ~ 18:00 (주말/공휴일 제외)`;
-                } else if (query.includes("장애인") || query.includes("휠체어") || query.includes("편의")) {
-                    responseText = `♿ <b>장애인 편의시설 안내</b><br><br>• <b>전용 주차 구역:</b> 각 주차장 진입로 근처 배치<br>• <b>엘리베이터:</b> 주경기장 및 실내체육관 전 층 운행<br>• <b>관람석:</b> 전용 휠체어 관람석 구비`;
-                }
-
-                botMsg.innerHTML = responseText;
-                chatBody.appendChild(botMsg);
+                chatBody.innerHTML += `<div class="chat-message bot">${responseText}</div>`;
                 chatBody.scrollTop = chatBody.scrollHeight;
             }, 300);
         }
